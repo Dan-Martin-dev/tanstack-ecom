@@ -48,6 +48,8 @@ help: ## Show this help message
 	@echo ""
 
 
+
+
 # Development Commands
 dev: ## Start development server
 	pnpm dev
@@ -111,7 +113,7 @@ ui: ## Add shadcn/ui component
 	pnpm ui
 
 # Git Commands
-git-commit: ## Automated git workflow
+commit: ## Automated git workflow
 	pnpm git:commit
 
 # Project Setup Commands
