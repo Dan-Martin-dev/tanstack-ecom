@@ -23,6 +23,13 @@ help: ## Show this help message
 	@echo "  db-generate  Generate migrations"
 	@echo "  db-reset     Reset database (development only)"
 	@echo ""
+	@echo "Database Queries:"
+	@echo "  db-connect   Connect to database with psql"
+	@echo "  db-tables    List all tables"
+	@echo "  db-users     Show all users"
+	@echo "  db-sessions  Show all sessions"
+	@echo "  db-accounts  Show all OAuth accounts"
+	@echo ""
 	@echo "Code Quality:"
 	@echo "  lint         Run ESLint"
 	@echo "  format       Format code with Prettier"
@@ -81,6 +88,22 @@ db-generate: ## Generate migrations
 
 db-reset: ## Reset database (development only)
 	pnpm db reset
+
+# Database Query Commands
+db-connect: ## Connect to database with psql
+	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom
+
+db-tables: ## List all tables
+	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "\dt"
+
+db-users: ## Show all users
+	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, name, email, email_verified, created_at FROM \"user\" ORDER BY created_at DESC;"
+
+db-sessions: ## Show all sessions
+	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, user_id, expires_at, created_at FROM session ORDER BY created_at DESC LIMIT 10;"
+
+db-accounts: ## Show all OAuth accounts
+	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, provider_id, user_id, created_at FROM account ORDER BY created_at DESC;"
 
 # Code Quality Commands
 lint: ## Run ESLint
