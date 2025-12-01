@@ -5,7 +5,12 @@ import { env } from "~/env/server";
 
 import * as schema from "~/lib/db/schema";
 
-const driver = postgres(env.DATABASE_URL);
+// Configure connection with pooling
+const driver = postgres(env.DATABASE_URL, {
+  max: 10, // Maximum number of connections in the pool
+  idle_timeout: 20, // Close idle connections after 20 seconds
+  connect_timeout: 10, // Connection timeout in seconds
+});
 
 const getDatabase = createServerOnlyFn(() =>
   drizzle({ client: driver, schema, casing: "snake_case" }),
