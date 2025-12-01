@@ -87,6 +87,9 @@ make dev-full     # Start database + dev server
 make db-up        # Start PostgreSQL
 make db-push      # Push schema to database
 make db-studio    # Open Drizzle Studio
+make db-connect   # Connect to database with psql
+make db-tables    # List all tables
+make db-users     # Show all users
 
 # Code Quality
 make check        # Run all checks (format, lint, types)

@@ -323,6 +323,9 @@ make dev-full     # Start database + development server
 make db-up        # Start PostgreSQL
 make db-push      # Push schema changes
 make db-studio    # Open database GUI
+make db-connect   # Connect to database with psql
+make db-tables    # List all tables
+make db-users     # Show all users
 
 # Code quality
 make check        # Run all checks (format, lint, types)
