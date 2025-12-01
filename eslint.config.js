@@ -30,5 +30,14 @@ export default defineConfig({
     // You can override any rules here
     "@typescript-eslint/no-deprecated": "warn",
   },
-  ignores: ["dist", ".wrangler", ".vercel", ".netlify", ".output", "build/"],
+  ignores: [
+    "dist",
+    ".wrangler",
+    ".vercel",
+    ".netlify",
+    ".output",
+    "build/",
+    // Exclude auto-generated files
+    "src/routeTree.gen.ts"
+  ],
 });

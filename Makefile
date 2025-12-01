@@ -70,6 +70,10 @@ preview: ## Preview production build
 start: ## Start production server
 	pnpm start
 
+
+
+
+
 # Database Commands
 db-up: ## Start PostgreSQL database
 	docker-compose up -d
@@ -89,6 +93,9 @@ db-generate: ## Generate migrations
 db-reset: ## Reset database (development only)
 	pnpm db reset
 
+
+
+
 # Database Query Commands
 db-connect: ## Connect to database with psql
 	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom
@@ -105,6 +112,9 @@ db-sessions: ## Show all sessions
 db-accounts: ## Show all OAuth accounts
 	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, provider_id, user_id, created_at FROM account ORDER BY created_at DESC;"
 
+
+
+
 # Code Quality Commands
 lint: ## Run ESLint
 	pnpm lint
@@ -118,12 +128,20 @@ check-types: ## Run TypeScript type checking
 check: ## Run all code quality checks
 	pnpm check
 
+
+
+
+
 # Authentication Commands
 auth-secret: ## Generate Better Auth secret
 	pnpm auth:secret
 
 auth-generate: ## Regenerate auth database schema
 	pnpm auth:generate
+
+
+
+
 
 # Dependency Commands
 deps: ## Update dependencies (patch/minor)
@@ -135,9 +153,15 @@ deps-major: ## Update dependencies (major versions)
 ui: ## Add shadcn/ui component
 	pnpm ui
 
+
+
+
 # Git Commands
 commit: ## Automated git workflow
 	pnpm git:commit
+
+
+
 
 # Project Setup Commands
 install: ## Install dependencies
@@ -149,6 +173,9 @@ setup: install db-up db-push ## Complete project setup (install + db + dev)
 clean: ## Clean build artifacts
 	rm -rf .output node_modules/.vite dist
 
+
+
+
 # Combined Commands for Common Workflows
 dev-full: db-up dev ## Start database and development server
 
@@ -157,6 +184,9 @@ build-deploy: check build ## Run checks and build for deployment
 db-setup: db-up db-push ## Setup database (start + push schema)
 
 code-check: format lint check-types ## Run all code quality tools
+
+
+
 
 # Development Workflow Shortcuts
 new-feature: ## Start new feature (format + dev)
