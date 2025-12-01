@@ -36,7 +36,7 @@ For a detailed explanation of the architecture, setup, and how everything works 
    pnpm db push
    ```
 
-   https://orm.drizzle.team/docs/migrations
+   See the [Drizzle migrations docs](https://orm.drizzle.team/docs/migrations) for more information.
 
 5. Run the development server:
 
@@ -61,7 +61,7 @@ Refer to the [TanStack Start hosting docs](https://tanstack.com/start/latest/doc
 
 ## Goodies
 
-#### Scripts
+### Scripts
 
 We use **pnpm** by default, but you can modify these scripts in [package.json](./package.json) to use your preferred package manager.
 
@@ -73,7 +73,7 @@ We use **pnpm** by default, but you can modify these scripts in [package.json](.
   - **`check`** - Run all three above. (e.g. `pnpm check`)
 - **`deps`** - Selectively upgrade dependencies via taze.
 
-#### Makefile Shortcuts
+### Makefile Shortcuts
 
 For convenience, a [Makefile](./Makefile) is provided with shortcuts for common development tasks:
 

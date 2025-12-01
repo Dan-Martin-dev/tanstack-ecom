@@ -1,8 +1,15 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { DefaultCatchBoundary } from "~/components/default-catch-boundary";
 import { authQueryOptions } from "~/lib/auth/queries";
 
 export const Route = createFileRoute("/(auth-pages)")({
   component: RouteComponent,
+  errorComponent: DefaultCatchBoundary,
+  pendingComponent: () => (
+    <div className="flex min-h-svh items-center justify-center">
+      <div className="text-muted-foreground">Loading...</div>
+    </div>
+  ),
   beforeLoad: async ({ context }) => {
     const REDIRECT_URL = "/dashboard";
 
