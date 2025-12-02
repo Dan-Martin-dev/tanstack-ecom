@@ -1,4 +1,17 @@
+
+
+
+# docker-compose.prod.yml
 services:
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL={{DATABASE_URL}}
+      - NODE_ENV=production
+    depends_on:
+      - db
+
   db:
     image: postgres:alpine
     ports:
@@ -9,6 +22,38 @@ services:
       - POSTGRES_USER={{POSTGRES_USER}}
       - POSTGRES_PASSWORD={{POSTGRES_PASSWORD}}
       - POSTGRES_DB={{POSTGRES_DB}}
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+
+  # Monitoring (optional)
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    restart: unless-stopped
+    volumes:
+      - uptime_data:/app/data
+
+  # Analytics (optional)
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/umami
+    depends_on:
+      - db
+
+  # Log viewer (optional)
+  dozzle:
+    image: amir20/dozzle:latest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   postgres_data_tanstarter:
+  caddy_data:
+  uptime_data:
