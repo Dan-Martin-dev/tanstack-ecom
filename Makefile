@@ -75,8 +75,11 @@ start: ## Start production server
 
 
 # Database Commands
-db-up: ## Start PostgreSQL database
+up:		## Start docker
 	docker-compose up -d
+
+db-up:	## Start PostgreSQL database
+	docker compose up db -d
 
 db-down: ## Stop PostgreSQL database
 	docker-compose down
