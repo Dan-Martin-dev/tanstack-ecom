@@ -73,6 +73,10 @@ export const verification = pgTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+// Note: User e-commerce relations (orders, addresses, cart, reviews, wishlist)
+// are defined in ecommerce.schema.ts to avoid circular imports.
+// Drizzle will merge all relations for the user table.
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
