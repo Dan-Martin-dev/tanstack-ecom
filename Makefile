@@ -15,17 +15,30 @@ help: ## Show this help message
 	@echo "  preview      Preview production build"
 	@echo "  start        Start production server"
 	@echo ""
-	@echo "Database:"
+	@echo "Database (Drizzle ORM):"
 	@echo "  db-up        Start PostgreSQL database"
 	@echo "  db-down      Stop PostgreSQL database"
-	@echo "  db-push      Push schema to database"
-	@echo "  db-studio    Open Drizzle Studio"
-	@echo "  db-generate  Generate migrations"
-	@echo "  db-reset     Reset database (development only)"
+	@echo "  db-push      Push schema directly (dev only)"
+	@echo "  db-generate  Generate migration SQL files"
+	@echo "  db-migrate   Apply pending migrations"
+	@echo "  db-studio    Open visual database browser"
+	@echo "  db-check     Check for schema drift"
+	@echo "  db-reset     Reset database (DESTROYS DATA)"
 	@echo ""
-	@echo "Database Queries:"
-	@echo "  db-connect   Connect to database with psql"
+	@echo "Database Queries (E-Commerce):"
+	@echo "  db-connect   Interactive psql shell"
 	@echo "  db-tables    List all tables"
+	@echo "  db-products  Show products with prices"
+	@echo "  db-categories Show categories"
+	@echo "  db-orders    Show recent orders"
+	@echo "  db-carts     Show active carts"
+	@echo "  db-reviews   Show recent reviews"
+	@echo "  db-coupons   Show all coupons"
+	@echo "  db-low-stock Show low stock products"
+	@echo "  db-stats     Show table row counts"
+	@echo "  db-size      Show database size"
+	@echo ""
+	@echo "Database Queries (Auth):"
 	@echo "  db-users     Show all users"
 	@echo "  db-sessions  Show all sessions"
 	@echo "  db-accounts  Show all OAuth accounts"
@@ -74,46 +87,129 @@ start: ## Start production server
 
 
 
-# Database Commands
-up:		## Start docker
+# =============================================================================
+# DATABASE COMMANDS (Drizzle ORM)
+# =============================================================================
+# Drizzle is your TypeScript ORM for PostgreSQL. These commands manage your
+# database schema and migrations.
+#
+# Workflow:
+#   1. Edit schema in src/lib/db/schema/*.ts
+#   2. Run 'make db-generate' to create migration files
+#   3. Run 'make db-push' to apply changes to database
+#   4. Use 'make db-studio' to visually browse your data
+# =============================================================================
+
+up: ## Start all Docker services (db, caddy, monitoring)
 	docker-compose up -d
 
-db-up:	## Start PostgreSQL database
+db-up: ## Start PostgreSQL database container only
 	docker compose up db -d
 
-db-down: ## Stop PostgreSQL database
+db-down: ## Stop all Docker services
 	docker-compose down
 
-db-push: ## Push schema to database
-	pnpm db push
+db-push: ## Push schema directly to database (dev only, no migration files)
+	# Use this for quick prototyping - applies schema changes immediately
+	# WARNING: May cause data loss if columns are removed
+	pnpm drizzle-kit push
 
-db-studio: ## Open Drizzle Studio
-	pnpm db studio
+db-studio: ## Open Drizzle Studio - visual database browser at https://local.drizzle.studio
+	# Opens a web UI to browse, edit, and query your database
+	pnpm drizzle-kit studio
 
-db-generate: ## Generate migrations
-	pnpm db generate
+db-generate: ## Generate SQL migration files from schema changes
+	# Creates timestamped SQL files in ./drizzle/ folder
+	# Review these files before applying to production!
+	pnpm drizzle-kit generate
 
-db-reset: ## Reset database (development only)
-	pnpm db reset
+db-migrate: ## Apply pending migrations to database
+	# Runs all unapplied migrations from ./drizzle/ folder
+	# Safe for production - tracks which migrations have been applied
+	pnpm drizzle-kit migrate
+
+db-reset: ## Reset database and reapply all migrations (DESTROYS ALL DATA)
+	# WARNING: This deletes all data! Only use in development
+	pnpm drizzle-kit push --force
+
+db-check: ## Check for schema drift between code and database
+	# Compares your schema files with the actual database state
+	pnpm drizzle-kit check
+
+db-drop: ## Drop all tables (DANGEROUS - development only)
+	# WARNING: This deletes everything! Use with caution
+	pnpm drizzle-kit drop
 
 
+# =============================================================================
+# DATABASE QUERY COMMANDS (Local PostgreSQL)
+# =============================================================================
+# Quick commands to inspect your database data using psql.
+# These connect to your LOCAL PostgreSQL (not Docker).
+# =============================================================================
+
+# Connection string for local PostgreSQL (uses DATABASE_URL from .env)
+PSQL_CMD = psql "$(DATABASE_URL)"
+
+db-connect: ## Connect to database with interactive psql shell
+	$(PSQL_CMD)
+
+db-tables: ## List all tables in the database
+	$(PSQL_CMD) -c "\dt"
+
+db-describe: ## Describe a table structure (usage: make db-describe TABLE=product)
+	$(PSQL_CMD) -c "\d $(TABLE)"
 
 
-# Database Query Commands
-db-connect: ## Connect to database with psql
-	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom
-
-db-tables: ## List all tables
-	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "\dt"
+# -----------------------------------------------------------------------------
+# Auth Tables
+# -----------------------------------------------------------------------------
 
 db-users: ## Show all users
-	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, name, email, email_verified, created_at FROM \"user\" ORDER BY created_at DESC;"
+	$(PSQL_CMD) -c "SELECT id, name, email, email_verified, created_at FROM \"user\" ORDER BY created_at DESC;"
 
-db-sessions: ## Show all sessions
-	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, user_id, expires_at, created_at FROM session ORDER BY created_at DESC LIMIT 10;"
+db-sessions: ## Show recent sessions
+	$(PSQL_CMD) -c "SELECT id, user_id, expires_at, created_at FROM session ORDER BY created_at DESC LIMIT 10;"
 
-db-accounts: ## Show all OAuth accounts
-	docker exec -it tanstack-ecom-db-1 psql -U vare -d tanstack-ecom -c "SELECT id, provider_id, user_id, created_at FROM account ORDER BY created_at DESC;"
+db-accounts: ## Show all OAuth accounts (GitHub, Google logins)
+	$(PSQL_CMD) -c "SELECT id, provider_id, user_id, created_at FROM account ORDER BY created_at DESC;"
+
+
+# -----------------------------------------------------------------------------
+# E-Commerce Tables
+# -----------------------------------------------------------------------------
+
+db-products: ## Show all products with prices (in ARS)
+	$(PSQL_CMD) -c "SELECT id, name, price/100 as price_ars, stock, is_active FROM product ORDER BY created_at DESC LIMIT 20;"
+
+db-categories: ## Show all categories
+	$(PSQL_CMD) -c "SELECT id, name, slug, parent_id, is_active FROM category ORDER BY sort_order;"
+
+db-orders: ## Show recent orders with status
+	$(PSQL_CMD) -c "SELECT order_number, status, total/100 as total_ars, payment_method, created_at FROM \"order\" ORDER BY created_at DESC LIMIT 20;"
+
+db-carts: ## Show active carts
+	$(PSQL_CMD) -c "SELECT c.id, c.user_id, COUNT(ci.id) as items, c.expires_at FROM cart c LEFT JOIN cart_item ci ON c.id = ci.cart_id GROUP BY c.id ORDER BY c.updated_at DESC LIMIT 10;"
+
+db-reviews: ## Show recent reviews
+	$(PSQL_CMD) -c "SELECT r.rating, r.title, p.name as product, u.name as reviewer, r.is_approved FROM review r JOIN product p ON r.product_id = p.id JOIN \"user\" u ON r.user_id = u.id ORDER BY r.created_at DESC LIMIT 10;"
+
+db-coupons: ## Show all coupons
+	$(PSQL_CMD) -c "SELECT code, discount_type, discount_value, used_count, usage_limit, is_active, expires_at FROM coupon ORDER BY created_at DESC;"
+
+db-low-stock: ## Show products with low stock
+	$(PSQL_CMD) -c "SELECT name, sku, stock, low_stock_threshold FROM product WHERE stock <= low_stock_threshold AND is_active = true ORDER BY stock;"
+
+
+# -----------------------------------------------------------------------------
+# Database Stats
+# -----------------------------------------------------------------------------
+
+db-stats: ## Show table row counts
+	$(PSQL_CMD) -c "SELECT schemaname, relname as table, n_live_tup as row_count FROM pg_stat_user_tables ORDER BY n_live_tup DESC;"
+
+db-size: ## Show database size
+	$(PSQL_CMD) -c "SELECT pg_size_pretty(pg_database_size('tanstack-ecom')) as database_size;"
 
 
 
