@@ -38,6 +38,6 @@ export default defineConfig({
     ".output",
     "build/",
     // Exclude auto-generated files
-    "src/routeTree.gen.ts"
+    "src/routeTree.gen.ts",
   ],
 });
