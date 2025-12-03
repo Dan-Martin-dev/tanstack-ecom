@@ -142,23 +142,28 @@ db-drop: ## Drop all tables (DANGEROUS - development only)
 
 
 # =============================================================================
-# DATABASE QUERY COMMANDS (Local PostgreSQL)
+# DATABASE QUERY COMMANDS (Docker PostgreSQL)
 # =============================================================================
-# Quick commands to inspect your database data using psql.
-# These connect to your LOCAL PostgreSQL (not Docker).
+# Quick commands to inspect your database data using psql inside Docker.
+# These connect to the PostgreSQL container, not local psql.
+# Credentials are read from .env file (POSTGRES_USER, POSTGRES_DB)
 # =============================================================================
 
-# Connection string for local PostgreSQL (uses DATABASE_URL from .env)
-PSQL_CMD = psql "$(DATABASE_URL)"
+# Load .env file
+include .env
+export
+
+# Docker psql command - runs psql inside the db container
+DOCKER_PSQL = docker exec -it tanstack-ecom-db-1 psql -U $(POSTGRES_USER) -d $(POSTGRES_DB)
 
 db-connect: ## Connect to database with interactive psql shell
-	$(PSQL_CMD)
+	$(DOCKER_PSQL)
 
 db-tables: ## List all tables in the database
-	$(PSQL_CMD) -c "\dt"
+	$(DOCKER_PSQL) -c "\dt"
 
 db-describe: ## Describe a table structure (usage: make db-describe TABLE=product)
-	$(PSQL_CMD) -c "\d $(TABLE)"
+	$(DOCKER_PSQL) -c "\d $(TABLE)"
 
 
 # -----------------------------------------------------------------------------
@@ -166,13 +171,13 @@ db-describe: ## Describe a table structure (usage: make db-describe TABLE=produc
 # -----------------------------------------------------------------------------
 
 db-users: ## Show all users
-	$(PSQL_CMD) -c "SELECT id, name, email, email_verified, created_at FROM \"user\" ORDER BY created_at DESC;"
+	$(DOCKER_PSQL) -c "SELECT id, name, email, email_verified, created_at FROM \"user\" ORDER BY created_at DESC;"
 
 db-sessions: ## Show recent sessions
-	$(PSQL_CMD) -c "SELECT id, user_id, expires_at, created_at FROM session ORDER BY created_at DESC LIMIT 10;"
+	$(DOCKER_PSQL) -c "SELECT id, user_id, expires_at, created_at FROM session ORDER BY created_at DESC LIMIT 10;"
 
 db-accounts: ## Show all OAuth accounts (GitHub, Google logins)
-	$(PSQL_CMD) -c "SELECT id, provider_id, user_id, created_at FROM account ORDER BY created_at DESC;"
+	$(DOCKER_PSQL) -c "SELECT id, provider_id, user_id, created_at FROM account ORDER BY created_at DESC;"
 
 
 # -----------------------------------------------------------------------------
@@ -180,25 +185,25 @@ db-accounts: ## Show all OAuth accounts (GitHub, Google logins)
 # -----------------------------------------------------------------------------
 
 db-products: ## Show all products with prices (in ARS)
-	$(PSQL_CMD) -c "SELECT id, name, price/100 as price_ars, stock, is_active FROM product ORDER BY created_at DESC LIMIT 20;"
+	$(DOCKER_PSQL) -c "SELECT id, name, price/100 as price_ars, stock, is_active FROM product ORDER BY created_at DESC LIMIT 20;"
 
 db-categories: ## Show all categories
-	$(PSQL_CMD) -c "SELECT id, name, slug, parent_id, is_active FROM category ORDER BY sort_order;"
+	$(DOCKER_PSQL) -c "SELECT id, name, slug, parent_id, is_active FROM category ORDER BY sort_order;"
 
 db-orders: ## Show recent orders with status
-	$(PSQL_CMD) -c "SELECT order_number, status, total/100 as total_ars, payment_method, created_at FROM \"order\" ORDER BY created_at DESC LIMIT 20;"
+	$(DOCKER_PSQL) -c "SELECT order_number, status, total/100 as total_ars, payment_method, created_at FROM \"order\" ORDER BY created_at DESC LIMIT 20;"
 
 db-carts: ## Show active carts
-	$(PSQL_CMD) -c "SELECT c.id, c.user_id, COUNT(ci.id) as items, c.expires_at FROM cart c LEFT JOIN cart_item ci ON c.id = ci.cart_id GROUP BY c.id ORDER BY c.updated_at DESC LIMIT 10;"
+	$(DOCKER_PSQL) -c "SELECT c.id, c.user_id, COUNT(ci.id) as items, c.expires_at FROM cart c LEFT JOIN cart_item ci ON c.id = ci.cart_id GROUP BY c.id ORDER BY c.updated_at DESC LIMIT 10;"
 
 db-reviews: ## Show recent reviews
-	$(PSQL_CMD) -c "SELECT r.rating, r.title, p.name as product, u.name as reviewer, r.is_approved FROM review r JOIN product p ON r.product_id = p.id JOIN \"user\" u ON r.user_id = u.id ORDER BY r.created_at DESC LIMIT 10;"
+	$(DOCKER_PSQL) -c "SELECT r.rating, r.title, p.name as product, u.name as reviewer, r.is_approved FROM review r JOIN product p ON r.product_id = p.id JOIN \"user\" u ON r.user_id = u.id ORDER BY r.created_at DESC LIMIT 10;"
 
 db-coupons: ## Show all coupons
-	$(PSQL_CMD) -c "SELECT code, discount_type, discount_value, used_count, usage_limit, is_active, expires_at FROM coupon ORDER BY created_at DESC;"
+	$(DOCKER_PSQL) -c "SELECT code, discount_type, discount_value, used_count, usage_limit, is_active, expires_at FROM coupon ORDER BY created_at DESC;"
 
 db-low-stock: ## Show products with low stock
-	$(PSQL_CMD) -c "SELECT name, sku, stock, low_stock_threshold FROM product WHERE stock <= low_stock_threshold AND is_active = true ORDER BY stock;"
+	$(DOCKER_PSQL) -c "SELECT name, sku, stock, low_stock_threshold FROM product WHERE stock <= low_stock_threshold AND is_active = true ORDER BY stock;;"
 
 
 # -----------------------------------------------------------------------------
@@ -206,10 +211,10 @@ db-low-stock: ## Show products with low stock
 # -----------------------------------------------------------------------------
 
 db-stats: ## Show table row counts
-	$(PSQL_CMD) -c "SELECT schemaname, relname as table, n_live_tup as row_count FROM pg_stat_user_tables ORDER BY n_live_tup DESC;"
+	$(DOCKER_PSQL) -c "SELECT schemaname, relname as table, n_live_tup as row_count FROM pg_stat_user_tables ORDER BY n_live_tup DESC;"
 
 db-size: ## Show database size
-	$(PSQL_CMD) -c "SELECT pg_size_pretty(pg_database_size('tanstack-ecom')) as database_size;"
+	$(DOCKER_PSQL) -c "SELECT pg_size_pretty(pg_database_size('tanstack-ecom')) as database_size;"
 
 
 
