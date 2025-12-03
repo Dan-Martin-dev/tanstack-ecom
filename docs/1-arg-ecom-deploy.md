@@ -2,11 +2,11 @@
 
 ## Payment Solutions for Argentina 🇦🇷
 
-| Provider | Pros | Cons |
-|----------|------|------|
-| **Mercado Pago** ✅ | Local leader, handles ARS, installments (cuotas), cash payments (Rapipago/PagoFácil) | 4.5% + IVA fee |
-| **Mobbex** | Lower fees, good API | Less known |
-| **Stripe** | International cards only | Doesn't support ARS directly |
+| Provider            | Pros                                                                                 | Cons                         |
+| ------------------- | ------------------------------------------------------------------------------------ | ---------------------------- |
+| **Mercado Pago** ✅ | Local leader, handles ARS, installments (cuotas), cash payments (Rapipago/PagoFácil) | 4.5% + IVA fee               |
+| **Mobbex**          | Lower fees, good API                                                                 | Less known                   |
+| **Stripe**          | International cards only                                                             | Doesn't support ARS directly |
 
 **Recommendation**: Use **Mercado Pago** as primary (for local customers) + optional Stripe for USD international sales.
 
@@ -14,17 +14,17 @@
 
 ## Updated Tech Stack (Free/Open Source)
 
-| Need | Solution | Cost |
-|------|----------|------|
-| **Payments** | Mercado Pago SDK | Free (pay per transaction) |
-| **Image Storage** | Cloudflare R2 | Free 10GB/mo |
-| **Email** | **Resend** (100/day free) or **Mailpit** (self-hosted dev) | Free |
-| **Search** | PostgreSQL Full-Text Search | Free (built-in) |
-| **Background Jobs** | **BullMQ** + Redis or **pg-boss** (PostgreSQL-only) | Free |
-| **Caching** | **Drizzle query caching** or Redis | Free |
-| **Monitoring** | **Uptime Kuma** (self-hosted) | Free |
-| **Analytics** | **Umami** or **Plausible** (self-hosted) | Free |
-| **Logs** | **Dozzle** (Docker logs viewer) | Free |
+| Need                | Solution                                                   | Cost                       |
+| ------------------- | ---------------------------------------------------------- | -------------------------- |
+| **Payments**        | Mercado Pago SDK                                           | Free (pay per transaction) |
+| **Image Storage**   | Cloudflare R2                                              | Free 10GB/mo               |
+| **Email**           | **Resend** (100/day free) or **Mailpit** (self-hosted dev) | Free                       |
+| **Search**          | PostgreSQL Full-Text Search                                | Free (built-in)            |
+| **Background Jobs** | **BullMQ** + Redis or **pg-boss** (PostgreSQL-only)        | Free                       |
+| **Caching**         | **Drizzle query caching** or Redis                         | Free                       |
+| **Monitoring**      | **Uptime Kuma** (self-hosted)                              | Free                       |
+| **Analytics**       | **Umami** or **Plausible** (self-hosted)                   | Free                       |
+| **Logs**            | **Dozzle** (Docker logs viewer)                            | Free                       |
 
 ---
 
@@ -82,30 +82,34 @@ pnpm add pdfkit
 ## Argentina-Specific Considerations
 
 ### 1. **Currency & Pricing**
+
 ```typescript
 // Store prices in centavos (integer) to avoid floating point issues
 // 1500000 = $15,000 ARS
-price: integer('price').notNull(),
-
-// Display with Intl
-new Intl.NumberFormat('es-AR', {
-  style: 'currency',
-  currency: 'ARS'
-}).format(price / 100)
+price: (integer("price").notNull(),
+  // Display with Intl
+  new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: "ARS",
+  }).format(price / 100));
 ```
 
 ### 2. **Shipping Zones**
+
 - **AMBA** (Buenos Aires metro)
 - **Interior** (rest of country)
 - Consider **Andreani**, **OCA**, **Correo Argentino** APIs
 
 ### 3. **Tax (IVA)**
+
 - Most products: **21% IVA**
 - Some categories: 10.5% or exempt
 - Store prices with IVA included (consumer-facing)
 
 ### 4. **Facturación Electrónica (AFIP)**
+
 For legal invoicing, you'll eventually need:
+
 - **AFIP Web Services** integration (complex)
 - Or use **Facturante**, **Colppy**, **TusFacturas** APIs
 
@@ -176,30 +180,30 @@ volumes:
 
 ## Monthly Cost Estimate (Argentina-Optimized)
 
-| Service | Cost |
-|---------|------|
-| Hetzner CX21 | €4.50/mo (~$5 USD) |
-| Cloudflare Free | $0 |
-| Cloudflare R2 (10GB) | $0 |
-| Resend (3K emails/mo) | $0 |
-| Domain (.com.ar) | ~$2,000 ARS/year at NIC.ar |
-| **Mercado Pago** | 4.5% + IVA per sale |
-| **Total Fixed** | **~$5 USD/mo** |
+| Service               | Cost                       |
+| --------------------- | -------------------------- |
+| Hetzner CX21          | €4.50/mo (~$5 USD)         |
+| Cloudflare Free       | $0                         |
+| Cloudflare R2 (10GB)  | $0                         |
+| Resend (3K emails/mo) | $0                         |
+| Domain (.com.ar)      | ~$2,000 ARS/year at NIC.ar |
+| **Mercado Pago**      | 4.5% + IVA per sale        |
+| **Total Fixed**       | **~$5 USD/mo**             |
 
 ---
 
 ## Open Source Alternatives Summary
 
-| Commercial | Open Source Alternative |
-|------------|------------------------|
-| Vercel | Self-hosted on Hetzner |
-| Supabase | PostgreSQL + Drizzle |
-| Clerk/Auth0 | Better Auth (you have it!) |
-| Algolia | PostgreSQL full-text search |
-| SendGrid | Resend free tier |
-| Datadog | Uptime Kuma + Dozzle |
-| Google Analytics | Umami (self-hosted) |
-| AWS S3 | Cloudflare R2 |
+| Commercial       | Open Source Alternative     |
+| ---------------- | --------------------------- |
+| Vercel           | Self-hosted on Hetzner      |
+| Supabase         | PostgreSQL + Drizzle        |
+| Clerk/Auth0      | Better Auth (you have it!)  |
+| Algolia          | PostgreSQL full-text search |
+| SendGrid         | Resend free tier            |
+| Datadog          | Uptime Kuma + Dozzle        |
+| Google Analytics | Umami (self-hosted)         |
+| AWS S3           | Cloudflare R2               |
 
 ---
 
@@ -210,4 +214,4 @@ volumes:
 3. **Create the `docker-compose.prod.yml`** with all services
 4. **Set up Cloudflare R2** for product images
 5. **Add PostgreSQL full-text search** for products</content>
-<parameter name="filePath">/home/vare/project/ecom_202/tanstack-ecom/docs/argentina-deployment.md
+   <parameter name="filePath">/home/vare/project/ecom_202/tanstack-ecom/docs/argentina-deployment.md

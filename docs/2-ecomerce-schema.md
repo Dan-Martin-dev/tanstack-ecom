@@ -16,19 +16,19 @@ Complete e-commerce schema optimized for Argentina with Mercado Pago integration
 
 ### Core Tables
 
-| Table | Purpose |
-|-------|---------|
-| **category** | Product categories with nested hierarchy |
-| **product** | Products with ARS pricing (centavos), SKU, stock, full-text search |
-| **product_image** | Multiple images per product (Cloudflare R2 URLs) |
-| **address** | User shipping addresses with Argentina-specific fields |
-| **cart** | Shopping carts (supports guest checkout via session ID) |
-| **cart_item** | Cart line items with quantity and price snapshot |
-| **order** | Orders with complete shipping snapshot and Mercado Pago integration |
-| **order_item** | Order line items with product snapshot at purchase time |
-| **review** | Product reviews with verified purchase support |
-| **wishlist_item** | User wishlists |
-| **coupon** | Discount codes (percentage or fixed, with limits) |
+| Table             | Purpose                                                             |
+| ----------------- | ------------------------------------------------------------------- |
+| **category**      | Product categories with nested hierarchy                            |
+| **product**       | Products with ARS pricing (centavos), SKU, stock, full-text search  |
+| **product_image** | Multiple images per product (Cloudflare R2 URLs)                    |
+| **address**       | User shipping addresses with Argentina-specific fields              |
+| **cart**          | Shopping carts (supports guest checkout via session ID)             |
+| **cart_item**     | Cart line items with quantity and price snapshot                    |
+| **order**         | Orders with complete shipping snapshot and Mercado Pago integration |
+| **order_item**    | Order line items with product snapshot at purchase time             |
+| **review**        | Product reviews with verified purchase support                      |
+| **wishlist_item** | User wishlists                                                      |
+| **coupon**        | Discount codes (percentage or fixed, with limits)                   |
 
 ## Detailed Schema
 
@@ -50,6 +50,7 @@ CREATE TABLE category (
 ```
 
 **Features:**
+
 - Nested categories (parent-child relationship)
 - SEO-friendly slugs
 - Sortable order
@@ -85,6 +86,7 @@ CREATE TABLE product (
 ```
 
 **Features:**
+
 - ARS pricing in centavos (integer to avoid floating point issues)
 - Inventory management with low stock alerts
 - Backorder support
@@ -106,6 +108,7 @@ CREATE TABLE product_image (
 ```
 
 **Features:**
+
 - Multiple images per product
 - Sortable order
 - Cloudflare R2 integration
@@ -136,6 +139,7 @@ CREATE TABLE address (
 ```
 
 **Features:**
+
 - Argentina-specific fields (province, document)
 - Shipping zone classification
 - Default address support
@@ -154,6 +158,7 @@ CREATE TABLE cart (
 ```
 
 **Features:**
+
 - Supports both authenticated and guest users
 - Automatic expiration (30 days)
 
@@ -172,6 +177,7 @@ CREATE TABLE cart_item (
 ```
 
 **Features:**
+
 - Price snapshot at time of adding
 - Prevents price changes during checkout
 
@@ -217,6 +223,7 @@ CREATE TABLE "order" (
 ```
 
 **Features:**
+
 - Human-readable order numbers (ORD-2024-0001)
 - Complete shipping address snapshot
 - Mercado Pago integration fields
@@ -241,6 +248,7 @@ CREATE TABLE order_item (
 ```
 
 **Features:**
+
 - Product snapshot at purchase time
 - Prevents data loss if product is deleted
 
@@ -263,6 +271,7 @@ CREATE TABLE review (
 ```
 
 **Features:**
+
 - Verified purchase reviews
 - Admin approval system
 - Rating system (1-5 stars)
@@ -301,6 +310,7 @@ CREATE TABLE coupon (
 ```
 
 **Features:**
+
 - Percentage or fixed amount discounts
 - Usage limits and expiration
 - Minimum order requirements
@@ -375,9 +385,9 @@ ORDER BY rank DESC;
 const priceInCentavos = 1500000; // $15,000 ARS
 
 // Display with proper formatting
-new Intl.NumberFormat('es-AR', {
-  style: 'currency',
-  currency: 'ARS'
+new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
 }).format(priceInCentavos / 100); // "$15.000"
 ```
 
@@ -388,4 +398,4 @@ new Intl.NumberFormat('es-AR', {
 3. **Build product CRUD API**
 4. **Create cart functionality**
 5. **Implement order management**</content>
-<parameter name="filePath">/home/vare/project/ecom_202/tanstack-ecom/docs/ecommerce-schema.md
+   <parameter name="filePath">/home/vare/project/ecom_202/tanstack-ecom/docs/ecommerce-schema.md
