@@ -56,7 +56,7 @@ export interface PaginatedProducts {
 // API functions (to be connected to real endpoints)
 async function fetchProducts(filters: ProductFilters): Promise<PaginatedProducts> {
   const params = new URLSearchParams();
-  
+
   if (filters.categorySlug) params.set("category", filters.categorySlug);
   if (filters.search) params.set("search", filters.search);
   if (filters.minPrice) params.set("minPrice", filters.minPrice.toString());

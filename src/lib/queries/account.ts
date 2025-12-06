@@ -4,7 +4,14 @@ import { queryOptions } from "@tanstack/react-query";
 export interface Order {
   id: number;
   orderNumber: string;
-  status: "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+  status:
+    | "pending"
+    | "confirmed"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded";
   paymentMethod: "mercado_pago" | "transfer" | "cash_on_delivery";
   paymentStatus: string;
   subtotal: number;

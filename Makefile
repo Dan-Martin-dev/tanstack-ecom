@@ -220,6 +220,12 @@ db-size: ## Show database size
 
 
 # Code Quality Commands
+# =============================================================================
+# Quick commands to run code quality tools: ESLint, Prettier, TypeScript.
+# These help maintain code consistency and catch errors early.
+# Finally a combined 'make check' runs all checks in one go.
+# =============================================================================
+
 lint: ## Run ESLint
 	pnpm lint
 

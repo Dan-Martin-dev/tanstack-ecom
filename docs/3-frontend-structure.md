@@ -9,6 +9,7 @@ Complete frontend structure for the Argentine e-commerce application built with 
 ### Route Groups
 
 #### `(shop)/` - Public Storefront
+
 Public-facing pages for browsing and shopping:
 
 - **`route.tsx`** - Layout component with ShopHeader, ShopFooter, and MiniCart
@@ -22,6 +23,7 @@ Public-facing pages for browsing and shopping:
 - **`search.tsx`** - Search results page
 
 #### `(authenticated)/account/` - User Account (Protected)
+
 User account management pages:
 
 - **`route.tsx`** - Account layout with sidebar navigation
@@ -34,6 +36,7 @@ User account management pages:
 ### Components
 
 #### `components/shop/`
+
 Reusable components for the storefront:
 
 - **`shop-header.tsx`** - Navigation header with:
@@ -66,6 +69,7 @@ Reusable components for the storefront:
 ### State Management
 
 #### `lib/cart/cart-context.tsx`
+
 React 19 Context with reducer pattern for cart management:
 
 - **Actions**: Add item, remove item, update quantity, clear cart
@@ -77,6 +81,7 @@ React 19 Context with reducer pattern for cart management:
 ### Data Fetching
 
 #### `lib/queries/`
+
 TanStack Query integration for server state:
 
 - **`products.ts`** - Product and category queries:
@@ -96,17 +101,20 @@ TanStack Query integration for server state:
 ## Argentina-Specific Features
 
 ### Currency & Pricing
+
 - ARS (Argentine Peso) formatting with centavos
 - "6 cuotas sin interés" (6 interest-free installments) display
 - Price ranges in centavos (stored as integers)
 
 ### UI/UX Localization
+
 - Spanish language throughout
 - Local shipping zones (AMBA, Interior, Pickup)
 - Mercado Pago payment integration ready
 - DNI/CUIT fields for Argentine users
 
 ### Commerce Features
+
 - Free shipping threshold ($50,000 ARS)
 - Multiple shipping zones
 - Cash on delivery option
@@ -115,23 +123,27 @@ TanStack Query integration for server state:
 ## Technical Implementation
 
 ### React 19 Features
+
 - `use` hook for context consumption
 - Context provider shorthand (`<Context>` instead of `<Context.Provider>`)
 - Improved performance and developer experience
 
 ### TanStack Router
+
 - File-based routing with route groups
 - Protected routes with authentication
 - Dynamic routes with slug parameters
 - Nested layouts
 
 ### TypeScript Integration
+
 - Full type safety across components
 - Database schema types integration
 - Query result typing
 - Context state typing
 
 ### Responsive Design
+
 - Mobile-first approach
 - Tailwind CSS utility classes
 - Adaptive layouts for different screen sizes
@@ -179,22 +191,26 @@ src/
 ## Next Steps
 
 ### API Integration
+
 - Connect React Query hooks to actual API endpoints
 - Implement authentication-protected routes
 - Add error handling and loading states
 
 ### Mercado Pago Integration
+
 - Payment processing
 - Order status updates
 - Webhook handling
 
 ### Advanced Features
+
 - Product reviews and ratings
 - Wishlist functionality
 - Order tracking
 - Email notifications
 
 ### Performance Optimization
+
 - Image optimization
 - Code splitting
 - Caching strategies

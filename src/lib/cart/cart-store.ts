@@ -33,21 +33,16 @@ export const useCartStore = create<CartStore>()(
 
       addItem: (item) =>
         set((state) => {
-          const existing = state.items.find(
-            (i) => i.productId === item.productId
-          );
+          const existing = state.items.find((i) => i.productId === item.productId);
           if (existing) {
             return {
               items: state.items.map((i) =>
                 i.productId === item.productId
                   ? {
                       ...i,
-                      quantity: Math.min(
-                        i.quantity + item.quantity,
-                        i.maxStock
-                      ),
+                      quantity: Math.min(i.quantity + item.quantity, i.maxStock),
                     }
-                  : i
+                  : i,
               ),
             };
           }
@@ -67,7 +62,7 @@ export const useCartStore = create<CartStore>()(
               : state.items.map((i) =>
                   i.productId === productId
                     ? { ...i, quantity: Math.min(quantity, i.maxStock) }
-                    : i
+                    : i,
                 ),
         })),
 
@@ -78,19 +73,17 @@ export const useCartStore = create<CartStore>()(
     {
       name: "ecom_cart",
       partialize: (state) => ({ items: state.items }), // Only persist items, not isOpen
-    }
-  )
+    },
+  ),
 );
 
 // Selectors for computed values (prevents unnecessary re-renders)
 export const useCartItemCount = () =>
-  useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.quantity, 0)
-  );
+  useCartStore((state) => state.items.reduce((sum, item) => sum + item.quantity, 0));
 
 export const useCartSubtotal = () =>
   useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
 
 // For backwards compatibility - hook that matches old useCart interface
