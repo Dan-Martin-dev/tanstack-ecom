@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useCart } from "~/lib/cart/cart-store";
 import { Button } from "~/components/ui/button";
+import { useCart } from "~/lib/cart/cart-store";
 
 export function MiniCart() {
   const { state, itemCount, subtotal, removeItem, updateQuantity, setCartOpen } =
@@ -29,9 +29,7 @@ export function MiniCart() {
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex items-center justify-between border-b px-4 py-4">
-            <h2 className="text-lg font-semibold">
-              Carrito ({itemCount})
-            </h2>
+            <h2 className="text-lg font-semibold">Carrito ({itemCount})</h2>
             <button
               onClick={() => setCartOpen(false)}
               className="hover:bg-muted rounded-full p-2"

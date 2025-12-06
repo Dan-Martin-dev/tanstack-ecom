@@ -101,7 +101,7 @@ function ProductsPage() {
                 <div className="relative aspect-square overflow-hidden rounded-t-lg">
                   <div className="bg-muted h-full w-full transition-transform group-hover:scale-105" />
                   {i % 3 === 0 && (
-                    <span className="bg-destructive absolute left-2 top-2 rounded px-2 py-1 text-xs font-medium text-white">
+                    <span className="bg-destructive absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium text-white">
                       -20%
                     </span>
                   )}
@@ -122,7 +122,10 @@ function ProductsPage() {
                     )}
                   </div>
                   <p className="text-muted-foreground mt-1 text-xs">
-                    12 cuotas de ${((((i + 1) * 15000) / 12)).toLocaleString("es-AR", { maximumFractionDigits: 0 })}
+                    12 cuotas de $
+                    {(((i + 1) * 15000) / 12).toLocaleString("es-AR", {
+                      maximumFractionDigits: 0,
+                    })}
                   </p>
                 </div>
               </Link>
@@ -138,9 +141,7 @@ function ProductsPage() {
               <button
                 key={page}
                 className={`rounded-md border px-3 py-2 text-sm ${
-                  page === 1
-                    ? "bg-primary text-primary-foreground"
-                    : "border-input"
+                  page === 1 ? "bg-primary text-primary-foreground" : "border-input"
                 }`}
               >
                 {page}

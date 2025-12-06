@@ -15,7 +15,7 @@ export function getRouter() {
       },
     },
   });
-  
+
   const router = createRouter({
     routeTree,
     context: { queryClient, user: null },

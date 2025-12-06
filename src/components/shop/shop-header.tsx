@@ -1,10 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { Suspense } from "react";
-import { Button } from "~/components/ui/button";
 import { ThemeToggle } from "~/components/theme-toggle";
+import { Button } from "~/components/ui/button";
 import { authQueryOptions } from "~/lib/auth/queries";
-import { useCartStore, useCartItemCount } from "~/lib/cart/cart-store";
+import { useCartItemCount, useCartStore } from "~/lib/cart/cart-store";
 
 export function ShopHeader() {
   const itemCount = useCartItemCount();
@@ -27,14 +27,14 @@ export function ShopHeader() {
           </Link>
 
           {/* Search bar */}
-          <div className="hidden flex-1 max-w-xl md:block">
+          <div className="hidden max-w-xl flex-1 md:block">
             <div className="relative">
               <input
                 type="search"
                 placeholder="Buscar productos..."
-                className="border-input bg-background w-full rounded-full border px-4 py-2 pl-10 focus:outline-none focus:ring-2 focus:ring-primary"
+                className="border-input bg-background focus:ring-primary w-full rounded-full border px-4 py-2 pl-10 focus:ring-2 focus:outline-none"
               />
-              <span className="text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2">
+              <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
                 🔍
               </span>
             </div>
@@ -54,7 +54,7 @@ export function ShopHeader() {
             >
               <span className="text-xl">🛒</span>
               {itemCount > 0 && (
-                <span className="bg-primary text-primary-foreground absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold">
+                <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold">
                   {itemCount > 99 ? "99+" : itemCount}
                 </span>
               )}
@@ -84,23 +84,21 @@ export function ShopHeader() {
                 Todas las categorías
               </Link>
             </li>
-            {["Electrónica", "Ropa", "Hogar", "Deportes", "Ofertas"].map(
-              (cat) => (
-                <li key={cat}>
-                  <Link
-                    to="/categories/$slug"
-                    params={{ slug: cat.toLowerCase() }}
-                    className={`whitespace-nowrap ${
-                      cat === "Ofertas"
-                        ? "text-destructive font-medium"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {cat}
-                  </Link>
-                </li>
-              ),
-            )}
+            {["Electrónica", "Ropa", "Hogar", "Deportes", "Ofertas"].map((cat) => (
+              <li key={cat}>
+                <Link
+                  to="/categories/$slug"
+                  params={{ slug: cat.toLowerCase() }}
+                  className={`whitespace-nowrap ${
+                    cat === "Ofertas"
+                      ? "text-destructive font-medium"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {cat}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       </nav>
@@ -140,7 +138,5 @@ function UserButton() {
 }
 
 function UserButtonSkeleton() {
-  return (
-    <div className="bg-muted h-9 w-24 animate-pulse rounded-md" />
-  );
+  return <div className="bg-muted h-9 w-24 animate-pulse rounded-md" />;
 }

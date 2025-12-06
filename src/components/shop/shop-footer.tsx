@@ -12,8 +12,8 @@ export function ShopFooter() {
               <span className="text-xl font-bold">TanStack Shop</span>
             </div>
             <p className="text-muted-foreground text-sm">
-              Tu tienda online de confianza. Comprá los mejores productos con
-              envío a todo el país.
+              Tu tienda online de confianza. Comprá los mejores productos con envío a todo
+              el país.
             </p>
           </div>
 
@@ -77,7 +77,10 @@ export function ShopFooter() {
             <ul className="text-muted-foreground space-y-2 text-sm">
               <li className="flex items-center gap-2">
                 <span>📧</span>
-                <a href="mailto:contacto@tanstackshop.com" className="hover:text-foreground">
+                <a
+                  href="mailto:contacto@tanstackshop.com"
+                  className="hover:text-foreground"
+                >
                   contacto@tanstackshop.com
                 </a>
               </li>
@@ -110,26 +113,30 @@ export function ShopFooter() {
 
         {/* Payment methods */}
         <div className="mt-8 border-t pt-8">
-          <p className="text-muted-foreground mb-3 text-center text-sm">
-            Medios de pago
-          </p>
+          <p className="text-muted-foreground mb-3 text-center text-sm">Medios de pago</p>
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {["💳 Visa", "💳 Mastercard", "💳 Amex", "🏦 Transferencia", "💵 Efectivo"].map(
-              (method) => (
-                <span
-                  key={method}
-                  className="bg-background rounded border px-3 py-1 text-sm"
-                >
-                  {method}
-                </span>
-              ),
-            )}
+            {[
+              "💳 Visa",
+              "💳 Mastercard",
+              "💳 Amex",
+              "🏦 Transferencia",
+              "💵 Efectivo",
+            ].map((method) => (
+              <span
+                key={method}
+                className="bg-background rounded border px-3 py-1 text-sm"
+              >
+                {method}
+              </span>
+            ))}
           </div>
         </div>
 
         {/* Copyright */}
         <div className="text-muted-foreground mt-8 border-t pt-8 text-center text-sm">
-          <p>© {new Date().getFullYear()} TanStack Shop. Todos los derechos reservados.</p>
+          <p>
+            © {new Date().getFullYear()} TanStack Shop. Todos los derechos reservados.
+          </p>
         </div>
       </div>
     </footer>
