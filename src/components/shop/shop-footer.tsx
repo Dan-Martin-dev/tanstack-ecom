@@ -98,9 +98,9 @@ export function ShopFooter() {
 
             {/* Social */}
             <div className="mt-4 flex gap-3">
-              {["📘", "📸", "🐦"].map((icon, i) => (
+              {["📘", "📸", "🐦"].map((icon) => (
                 <a
-                  key={i}
+                  key={icon}
                   href="#"
                   className="bg-background hover:bg-accent flex h-10 w-10 items-center justify-center rounded-full border"
                 >

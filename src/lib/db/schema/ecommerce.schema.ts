@@ -42,7 +42,8 @@ export const shippingZoneEnum = pgEnum("shipping_zone", [
 // CATEGORIES
 // ============================================================================
 
-export const category = pgTable(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const category: any = pgTable(
   "category",
   {
     id: uuid("id").defaultRandom().primaryKey(),
@@ -50,7 +51,8 @@ export const category = pgTable(
     slug: varchar("slug", { length: 100 }).notNull().unique(),
     description: text("description"),
     image: text("image"), // Cloudflare R2 URL
-    parentId: uuid("parent_id").references((): any => category.id, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parentId: uuid("parent_id").references(() => (category as any).id, {
       onDelete: "set null",
     }),
     isActive: boolean("is_active").default(true).notNull(),

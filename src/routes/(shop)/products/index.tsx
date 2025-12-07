@@ -91,45 +91,48 @@ function ProductsPage() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {/* Product Cards */}
-            {Array.from({ length: 9 }).map((_, i) => (
-              <Link
-                key={i}
-                to="/products/$slug"
-                params={{ slug: `product-${i + 1}` }}
-                className="bg-card group rounded-lg border transition-shadow hover:shadow-lg"
-              >
-                <div className="relative aspect-square overflow-hidden rounded-t-lg">
-                  <div className="bg-muted h-full w-full transition-transform group-hover:scale-105" />
-                  {i % 3 === 0 && (
-                    <span className="bg-destructive absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium text-white">
-                      -20%
-                    </span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-medium">Producto de ejemplo {i + 1}</h3>
-                  <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-                    Descripción breve del producto
-                  </p>
-                  <div className="mt-3 flex items-baseline gap-2">
-                    <span className="text-lg font-bold">
-                      ${((i + 1) * 15000).toLocaleString("es-AR")}
-                    </span>
+            {Array.from({ length: 9 }).map((_, i) => {
+              const productSlug = `product-${i + 1}`;
+              return (
+                <Link
+                  key={productSlug}
+                  to="/products/$slug"
+                  params={{ slug: productSlug }}
+                  className="bg-card group rounded-lg border transition-shadow hover:shadow-lg"
+                >
+                  <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                    <div className="bg-muted h-full w-full transition-transform group-hover:scale-105" />
                     {i % 3 === 0 && (
-                      <span className="text-muted-foreground text-sm line-through">
-                        ${((i + 1) * 18750).toLocaleString("es-AR")}
+                      <span className="bg-destructive absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium text-white">
+                        -20%
                       </span>
                     )}
                   </div>
-                  <p className="text-muted-foreground mt-1 text-xs">
-                    12 cuotas de $
-                    {(((i + 1) * 15000) / 12).toLocaleString("es-AR", {
-                      maximumFractionDigits: 0,
-                    })}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-4">
+                    <h3 className="font-medium">Producto de ejemplo {i + 1}</h3>
+                    <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                      Descripción breve del producto
+                    </p>
+                    <div className="mt-3 flex items-baseline gap-2">
+                      <span className="text-lg font-bold">
+                        ${((i + 1) * 15000).toLocaleString("es-AR")}
+                      </span>
+                      {i % 3 === 0 && (
+                        <span className="text-muted-foreground text-sm line-through">
+                          ${((i + 1) * 18750).toLocaleString("es-AR")}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground mt-1 text-xs">
+                      12 cuotas de $
+                      {(((i + 1) * 15000) / 12).toLocaleString("es-AR", {
+                        maximumFractionDigits: 0,
+                      })}
+                    </p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
 
           {/* Pagination */}

@@ -45,29 +45,32 @@ function CategoryPage() {
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <Link
-            key={i}
-            to="/products/$slug"
-            params={{ slug: `${slug}-product-${i + 1}` }}
-            className="bg-card group rounded-lg border transition-shadow hover:shadow-lg"
-          >
-            <div className="relative aspect-square overflow-hidden rounded-t-lg">
-              <div className="bg-muted h-full w-full transition-transform group-hover:scale-105" />
-            </div>
-            <div className="p-4">
-              <h3 className="font-medium">
-                Producto de {categoryName} #{i + 1}
-              </h3>
-              <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-                Descripción del producto
-              </p>
-              <p className="mt-3 text-lg font-bold">
-                ${((i + 1) * 8500).toLocaleString("es-AR")}
-              </p>
-            </div>
-          </Link>
-        ))}
+        {Array.from({ length: 12 }).map((_, i) => {
+          const productSlug = `${slug}-product-${i + 1}`;
+          return (
+            <Link
+              key={productSlug}
+              to="/products/$slug"
+              params={{ slug: productSlug }}
+              className="bg-card group rounded-lg border transition-shadow hover:shadow-lg"
+            >
+              <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                <div className="bg-muted h-full w-full transition-transform group-hover:scale-105" />
+              </div>
+              <div className="p-4">
+                <h3 className="font-medium">
+                  Producto de {categoryName} #{i + 1}
+                </h3>
+                <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                  Descripción del producto
+                </p>
+                <p className="mt-3 text-lg font-bold">
+                  ${((i + 1) * 8500).toLocaleString("es-AR")}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
