@@ -100,11 +100,11 @@ export function ProductCard({
         </Link>
 
         {/* Rating */}
-        {product.rating && (
+        {product.rating != null && (
           <div className="mt-1 flex items-center gap-1">
             <span className="text-yellow-500">★</span>
             <span className="text-sm">{product.rating.toFixed(1)}</span>
-            {product.reviewCount && (
+            {product.reviewCount != null && (
               <span className="text-muted-foreground text-xs">
                 ({product.reviewCount})
               </span>
@@ -115,7 +115,7 @@ export function ProductCard({
         {/* Price */}
         <div className="mt-2 flex items-center gap-2">
           <span className="text-lg font-bold">{formatPrice(product.price)}</span>
-          {product.originalPrice && (
+          {product.originalPrice != null && (
             <span className="text-muted-foreground text-sm line-through">
               {formatPrice(product.originalPrice)}
             </span>
