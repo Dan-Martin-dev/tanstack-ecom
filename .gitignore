@@ -22,3 +22,6 @@ dist
 /public/build
 
 .tanstack
+
+# Ignore docs directory (contains generated or sensitive docs)
+docs/
