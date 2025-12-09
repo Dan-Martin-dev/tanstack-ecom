@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 
 // Types
 export interface CartItem {
-  productId: number;
+  productId: string;
   name: string;
   slug: string;
   price: number;
@@ -18,8 +18,8 @@ interface CartStore {
 
   // Actions
   addItem: (item: CartItem) => void;
-  removeItem: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeItem: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   toggleCart: () => void;
   setCartOpen: (isOpen: boolean) => void;

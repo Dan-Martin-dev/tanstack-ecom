@@ -1,10 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { CategoryWithChildren, ProductWithRelations } from "~/lib/server/products";
+import { getCategories, getProducts } from "~/lib/server/products";
 
 export const Route = createFileRoute("/(shop)/products/")({
+  loader: async () => {
+    const [productsData, categories] = await Promise.all([
+      getProducts(),
+      getCategories(),
+    ]);
+    return { productsData, categories };
+  },
   component: ProductsPage,
 });
 
+function formatPrice(centavos: number): string {
+  return (centavos / 100).toLocaleString("es-AR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+}
+
 function ProductsPage() {
+  const { productsData, categories } = Route.useLoaderData();
+  const { products, total, page, totalPages } = productsData;
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Breadcrumb */}
@@ -23,15 +42,30 @@ function ProductsPage() {
             <div>
               <h3 className="mb-3 font-semibold">Categorías</h3>
               <ul className="space-y-2">
-                {["Electrónica", "Ropa", "Hogar", "Deportes"].map((cat) => (
-                  <li key={cat}>
+                {categories.map((cat: CategoryWithChildren) => (
+                  <li key={cat.id}>
                     <Link
                       to="/categories/$slug"
-                      params={{ slug: cat.toLowerCase() }}
+                      params={{ slug: cat.slug }}
                       className="text-muted-foreground hover:text-foreground text-sm"
                     >
-                      {cat}
+                      {cat.name}
                     </Link>
+                    {cat.children.length > 0 && (
+                      <ul className="mt-1 ml-4 space-y-1">
+                        {cat.children.map((sub: CategoryWithChildren) => (
+                          <li key={sub.id}>
+                            <Link
+                              to="/categories/$slug"
+                              params={{ slug: sub.slug }}
+                              className="text-muted-foreground hover:text-foreground text-xs"
+                            >
+                              {sub.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -79,7 +113,7 @@ function ProductsPage() {
         <div className="flex-1">
           <div className="mb-6 flex items-center justify-between">
             <p className="text-muted-foreground text-sm">
-              Mostrando 1-12 de 48 productos
+              Mostrando {products.length} de {total} productos
             </p>
             <select className="border-input bg-background rounded-md border px-3 py-2 text-sm">
               <option>Más relevantes</option>
@@ -89,71 +123,121 @@ function ProductsPage() {
             </select>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-            {/* Product Cards */}
-            {Array.from({ length: 9 }).map((_, i) => {
-              const productSlug = `product-${i + 1}`;
-              return (
-                <Link
-                  key={productSlug}
-                  to="/products/$slug"
-                  params={{ slug: productSlug }}
-                  className="bg-card group rounded-lg border transition-shadow hover:shadow-lg"
-                >
-                  <div className="relative aspect-square overflow-hidden rounded-t-lg">
-                    <div className="bg-muted h-full w-full transition-transform group-hover:scale-105" />
-                    {i % 3 === 0 && (
-                      <span className="bg-destructive absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium text-white">
-                        -20%
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-medium">Producto de ejemplo {i + 1}</h3>
-                    <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
-                      Descripción breve del producto
-                    </p>
-                    <div className="mt-3 flex items-baseline gap-2">
-                      <span className="text-lg font-bold">
-                        ${((i + 1) * 15000).toLocaleString("es-AR")}
-                      </span>
-                      {i % 3 === 0 && (
-                        <span className="text-muted-foreground text-sm line-through">
-                          ${((i + 1) * 18750).toLocaleString("es-AR")}
+          {products.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-muted-foreground text-lg">
+                No hay productos disponibles.
+              </p>
+              <p className="text-muted-foreground mt-2 text-sm">
+                Volvé pronto para ver nuestras novedades.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {products.map((product: ProductWithRelations) => {
+                const hasDiscount =
+                  product.compareAtPrice != null &&
+                  product.compareAtPrice > product.price;
+                const discountPercent = hasDiscount
+                  ? Math.round(
+                      ((product.compareAtPrice! - product.price) /
+                        product.compareAtPrice!) *
+                        100,
+                    )
+                  : 0;
+                const primaryImage = product.images[0];
+
+                return (
+                  <Link
+                    key={product.id}
+                    to="/products/$slug"
+                    params={{ slug: product.slug }}
+                    className="bg-card group rounded-lg border transition-shadow hover:shadow-lg"
+                  >
+                    <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                      {primaryImage ? (
+                        <img
+                          src={primaryImage.url}
+                          alt={primaryImage.alt || product.name}
+                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="bg-muted flex h-full w-full items-center justify-center">
+                          <span className="text-muted-foreground text-4xl">📷</span>
+                        </div>
+                      )}
+                      {hasDiscount && (
+                        <span className="bg-destructive absolute top-2 left-2 rounded px-2 py-1 text-xs font-medium text-white">
+                          -{discountPercent}%
+                        </span>
+                      )}
+                      {product.stock <= 5 && product.stock > 0 && (
+                        <span className="absolute top-2 right-2 rounded bg-orange-500 px-2 py-1 text-xs font-medium text-white">
+                          ¡Últimas unidades!
                         </span>
                       )}
                     </div>
-                    <p className="text-muted-foreground mt-1 text-xs">
-                      12 cuotas de $
-                      {(((i + 1) * 15000) / 12).toLocaleString("es-AR", {
-                        maximumFractionDigits: 0,
-                      })}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+                    <div className="p-4">
+                      <h3 className="font-medium">{product.name}</h3>
+                      {product.category && (
+                        <p className="text-muted-foreground text-xs">
+                          {product.category.name}
+                        </p>
+                      )}
+                      {product.description && (
+                        <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
+                          {product.description}
+                        </p>
+                      )}
+                      <div className="mt-3 flex items-baseline gap-2">
+                        <span className="text-lg font-bold">
+                          ${formatPrice(product.price)}
+                        </span>
+                        {hasDiscount && (
+                          <span className="text-muted-foreground text-sm line-through">
+                            ${formatPrice(product.compareAtPrice!)}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        12 cuotas de ${formatPrice(Math.round(product.price / 12))}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
           {/* Pagination */}
-          <div className="mt-8 flex justify-center gap-2">
-            <button className="border-input rounded-md border px-3 py-2 text-sm">
-              ← Anterior
-            </button>
-            {[1, 2, 3, 4, 5].map((page) => (
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center gap-2">
               <button
-                key={page}
-                className={`rounded-md border px-3 py-2 text-sm ${
-                  page === 1 ? "bg-primary text-primary-foreground" : "border-input"
-                }`}
+                className="border-input rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+                disabled={page <= 1}
               >
-                {page}
+                ← Anterior
               </button>
-            ))}
-            <button className="border-input rounded-md border px-3 py-2 text-sm">
-              Siguiente →
-            </button>
-          </div>
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(
+                (p) => (
+                  <button
+                    key={p}
+                    className={`rounded-md border px-3 py-2 text-sm ${
+                      p === page ? "bg-primary text-primary-foreground" : "border-input"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ),
+              )}
+              <button
+                className="border-input rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+                disabled={page >= totalPages}
+              >
+                Siguiente →
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
