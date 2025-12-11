@@ -15,7 +15,9 @@ function ShopLayout() {
         <Outlet />
       </main>
       <ShopFooter />
-      <MiniCart />
+            <ClientOnly>
+        <MiniCart />
+      </ClientOnly>
     </div>
   );
 }

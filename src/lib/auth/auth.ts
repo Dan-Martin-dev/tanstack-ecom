@@ -33,10 +33,11 @@ const getAuthConfig = createServerOnlyFn(() =>
         clientId: env.GITHUB_CLIENT_ID!,
         clientSecret: env.GITHUB_CLIENT_SECRET!,
       },
-      google: {
-        clientId: env.GOOGLE_CLIENT_ID!,
-        clientSecret: env.GOOGLE_CLIENT_SECRET!,
-      },
+      // TODO: Re-enable Google OAuth when credentials are configured
+      // google: {
+      //   clientId: env.GOOGLE_CLIENT_ID!,
+      //   clientSecret: env.GOOGLE_CLIENT_SECRET!,
+      // },
     },
 
     // https://www.better-auth.com/docs/authentication/email-password

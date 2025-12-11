@@ -1,15 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { Suspense } from "react";
+import { ClientOnly } from "~/components/client-only";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { Button } from "~/components/ui/button";
 import { authQueryOptions } from "~/lib/auth/queries";
-import { useCartItemCount, useCartStore } from "~/lib/cart/cart-store";
 
 export function ShopHeader() {
-  const itemCount = useCartItemCount();
-  const toggleCart = useCartStore((state) => state.toggleCart);
-
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       {/* Top bar */}
@@ -42,23 +39,22 @@ export function ShopHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <ThemeToggle />
+            <ClientOnly>
+              <ThemeToggle />
+            </ClientOnly>
 
             <Suspense fallback={<UserButtonSkeleton />}>
               <UserButton />
             </Suspense>
 
-            <button
-              onClick={toggleCart}
+            {/* Cart button - rendered without SSR hooks, just a static button */}
+            {/* The actual cart count will be shown by MiniCart */}
+            <Link
+              to="/cart"
               className="hover:bg-accent relative flex h-9 w-9 items-center justify-center rounded-md"
             >
               <span className="text-xl">🛒</span>
-              {itemCount > 0 && (
-                <span className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold">
-                  {itemCount > 99 ? "99+" : itemCount}
-                </span>
-              )}
-            </button>
+            </Link>
           </div>
         </div>
 
