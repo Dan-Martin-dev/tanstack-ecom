@@ -72,16 +72,16 @@ help: ## Show this help message
 
 # Development Commands
 dev: ## Start development server
-	pnpm dev
+	bun dev
 
 build: ## Build for production
-	pnpm build
+	bun build
 
 preview: ## Preview production build
-	pnpm preview
+	bun preview
 
 start: ## Start production server
-	pnpm start
+	bun start
 
 
 
@@ -112,33 +112,33 @@ db-down: ## Stop all Docker services
 db-push: ## Push schema directly to database (dev only, no migration files)
 	# Use this for quick prototyping - applies schema changes immediately
 	# WARNING: May cause data loss if columns are removed
-	pnpm drizzle-kit push
+	bun drizzle-kit push
 
 db-studio: ## Open Drizzle Studio - visual database browser at https://local.drizzle.studio
 	# Opens a web UI to browse, edit, and query your database
-	pnpm drizzle-kit studio
+	bun drizzle-kit studio
 
 db-generate: ## Generate SQL migration files from schema changes
 	# Creates timestamped SQL files in ./drizzle/ folder
 	# Review these files before applying to production!
-	pnpm drizzle-kit generate
+	bun drizzle-kit generate
 
 db-migrate: ## Apply pending migrations to database
 	# Runs all unapplied migrations from ./drizzle/ folder
 	# Safe for production - tracks which migrations have been applied
-	pnpm drizzle-kit migrate
+	bun drizzle-kit migrate
 
 db-reset: ## Reset database and reapply all migrations (DESTROYS ALL DATA)
 	# WARNING: This deletes all data! Only use in development
-	pnpm drizzle-kit push --force
+	bun drizzle-kit push --force
 
 db-check: ## Check for schema drift between code and database
 	# Compares your schema files with the actual database state
-	pnpm drizzle-kit check
+	bun drizzle-kit check
 
 db-drop: ## Drop all tables (DANGEROUS - development only)
 	# WARNING: This deletes everything! Use with caution
-	pnpm drizzle-kit drop
+	bun drizzle-kit drop
 
 
 # =============================================================================
@@ -227,16 +227,16 @@ db-size: ## Show database size
 # =============================================================================
 
 lint: ## Run ESLint
-	pnpm lint
+	bun lint
 
 format: ## Format code with Prettier
-	pnpm format
+	bun format
 
 check-types: ## Run TypeScript type checking
-	pnpm check-types
+	bun check-types
 
 check: ## Run all code quality checks
-	pnpm check
+	bun check
 
 
 
@@ -244,10 +244,10 @@ check: ## Run all code quality checks
 
 # Authentication Commands
 auth-secret: ## Generate Better Auth secret
-	pnpm auth:secret
+	bun auth:secret
 
 auth-generate: ## Regenerate auth database schema
-	pnpm auth:generate
+	bun auth:generate
 
 
 
@@ -255,27 +255,27 @@ auth-generate: ## Regenerate auth database schema
 
 # Dependency Commands
 deps: ## Update dependencies (patch/minor)
-	pnpm deps
+	bun deps
 
 deps-major: ## Update dependencies (major versions)
-	pnpm deps:major
+	bun deps:major
 
 ui: ## Add shadcn/ui component
-	pnpm ui
+	bun ui
 
 
 
 
 # Git Commands
 commit: ## Automated git workflow
-	pnpm git:commit
+	bun git:commit
 
 
 
 
 # Project Setup Commands
 install: ## Install dependencies
-	pnpm install
+	bun install
 
 setup: install db-up db-push ## Complete project setup (install + db + dev)
 	@echo "🚀 Setup complete! Run 'make dev' to start development server"
@@ -331,7 +331,7 @@ stop-all: ## Stop all running processes
 info: ## Show project information
 	@echo "📊 Project Information:"
 	@echo "Node version: $$(node --version)"
-	@echo "PNPM version: $$(pnpm --version)"
+	@echo "PNPM version: $$(bun --version)"
 	@echo "Database: PostgreSQL (Docker)"
 	@echo "Framework: TanStack Start + React 19"
 	@echo "Styling: Tailwind CSS + shadcn/ui"
