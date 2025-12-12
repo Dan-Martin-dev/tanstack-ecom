@@ -24,7 +24,9 @@ export const checkoutSchema = z
     billingAddress: addressSchema.optional(),
     sameAsBilling: z.boolean().default(true),
     notes: z.string().max(500, "Notas muy largas").optional(),
-    paymentMethod: z.enum(["card", "transfer", "cash"]).default("card"),
+    paymentMethod: z
+      .enum(["mercadopago", "cash_on_delivery", "bank_transfer"])
+      .default("mercadopago"),
   })
   .refine(
     (data) => {

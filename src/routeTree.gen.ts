@@ -14,6 +14,7 @@ import { Route as authenticatedRouteRouteImport } from './routes/(authenticated)
 import { Route as authPagesRouteRouteImport } from './routes/(auth-pages)/route'
 import { Route as shopIndexRouteImport } from './routes/(shop)/index'
 import { Route as shopSearchRouteImport } from './routes/(shop)/search'
+import { Route as shopOrderConfirmationRouteImport } from './routes/(shop)/order-confirmation'
 import { Route as shopCheckoutRouteImport } from './routes/(shop)/checkout'
 import { Route as shopCartRouteImport } from './routes/(shop)/cart'
 import { Route as authPagesSignupRouteImport } from './routes/(auth-pages)/signup'
@@ -52,6 +53,11 @@ const shopIndexRoute = shopIndexRouteImport.update({
 const shopSearchRoute = shopSearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => shopRouteRoute,
+} as any)
+const shopOrderConfirmationRoute = shopOrderConfirmationRouteImport.update({
+  id: '/order-confirmation',
+  path: '/order-confirmation',
   getParentRoute: () => shopRouteRoute,
 } as any)
 const shopCheckoutRoute = shopCheckoutRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof authPagesSignupRoute
   '/cart': typeof shopCartRoute
   '/checkout': typeof shopCheckoutRoute
+  '/order-confirmation': typeof shopOrderConfirmationRoute
   '/search': typeof shopSearchRoute
   '/': typeof shopIndexRoute
   '/account/addresses': typeof authenticatedAccountAddressesRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/signup': typeof authPagesSignupRoute
   '/cart': typeof shopCartRoute
   '/checkout': typeof shopCheckoutRoute
+  '/order-confirmation': typeof shopOrderConfirmationRoute
   '/search': typeof shopSearchRoute
   '/': typeof shopIndexRoute
   '/account/addresses': typeof authenticatedAccountAddressesRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/(auth-pages)/signup': typeof authPagesSignupRoute
   '/(shop)/cart': typeof shopCartRoute
   '/(shop)/checkout': typeof shopCheckoutRoute
+  '/(shop)/order-confirmation': typeof shopOrderConfirmationRoute
   '/(shop)/search': typeof shopSearchRoute
   '/(shop)/': typeof shopIndexRoute
   '/(authenticated)/account/addresses': typeof authenticatedAccountAddressesRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/cart'
     | '/checkout'
+    | '/order-confirmation'
     | '/search'
     | '/'
     | '/account/addresses'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/cart'
     | '/checkout'
+    | '/order-confirmation'
     | '/search'
     | '/'
     | '/account/addresses'
@@ -265,6 +276,7 @@ export interface FileRouteTypes {
     | '/(auth-pages)/signup'
     | '/(shop)/cart'
     | '/(shop)/checkout'
+    | '/(shop)/order-confirmation'
     | '/(shop)/search'
     | '/(shop)/'
     | '/(authenticated)/account/addresses'
@@ -322,6 +334,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof shopSearchRouteImport
+      parentRoute: typeof shopRouteRoute
+    }
+    '/(shop)/order-confirmation': {
+      id: '/(shop)/order-confirmation'
+      path: '/order-confirmation'
+      fullPath: '/order-confirmation'
+      preLoaderRoute: typeof shopOrderConfirmationRouteImport
       parentRoute: typeof shopRouteRoute
     }
     '/(shop)/checkout': {
@@ -527,6 +546,7 @@ const authenticatedRouteRouteWithChildren =
 interface shopRouteRouteChildren {
   shopCartRoute: typeof shopCartRoute
   shopCheckoutRoute: typeof shopCheckoutRoute
+  shopOrderConfirmationRoute: typeof shopOrderConfirmationRoute
   shopSearchRoute: typeof shopSearchRoute
   shopIndexRoute: typeof shopIndexRoute
   shopCategoriesSlugRoute: typeof shopCategoriesSlugRoute
@@ -538,6 +558,7 @@ interface shopRouteRouteChildren {
 const shopRouteRouteChildren: shopRouteRouteChildren = {
   shopCartRoute: shopCartRoute,
   shopCheckoutRoute: shopCheckoutRoute,
+  shopOrderConfirmationRoute: shopOrderConfirmationRoute,
   shopSearchRoute: shopSearchRoute,
   shopIndexRoute: shopIndexRoute,
   shopCategoriesSlugRoute: shopCategoriesSlugRoute,
