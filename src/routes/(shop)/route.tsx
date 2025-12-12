@@ -1,4 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { ClientOnly } from "~/components/client-only";
 import { MiniCart } from "~/components/shop/mini-cart";
 import { ShopFooter } from "~/components/shop/shop-footer";
 import { ShopHeader } from "~/components/shop/shop-header";
@@ -15,7 +16,7 @@ function ShopLayout() {
         <Outlet />
       </main>
       <ShopFooter />
-            <ClientOnly>
+      <ClientOnly>
         <MiniCart />
       </ClientOnly>
     </div>
