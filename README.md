@@ -13,6 +13,8 @@ A minimal starter template for 🏝️ TanStack Start. [→ Preview here](https:
 
 For a detailed explanation of the architecture, setup, and how everything works together, see the [Architecture Guide](./docs/architecture.md).
 
+For developer onboarding, tooling setup, and common workflows, see the [Developer Context](./docs/CONTEXT.md).
+
 ## Getting Started
 
 1. [Use this template](https://github.com/new?template_name=react-tanstarter&template_owner=dotnize) or clone this repository with gitpick:
