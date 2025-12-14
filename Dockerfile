@@ -1,25 +1,22 @@
 # Build stage
-FROM node:22-alpine AS builder
-
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+FROM oven/bun:1 AS builder
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json bun.lock ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN bun install --frozen-lockfile
 
 # Copy source code
 COPY . .
 
 # Build the app
-RUN pnpm build
+RUN bun run build
 
 # Production stage
-FROM node:22-alpine AS runner
+FROM oven/bun:1-alpine AS runner
 
 WORKDIR /app
 
@@ -35,4 +32,4 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 
 # Run the server
-CMD ["node", ".output/server/index.mjs"]
+CMD ["bun", ".output/server/index.mjs"]
