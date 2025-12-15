@@ -31,10 +31,17 @@ function SignupForm() {
 
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (data: { name: string; email: string; password: string }) => {
-      return await authClient.signUp.email({
+      const result = await authClient.signUp.email({
         ...data,
         callbackURL: redirectUrl,
       });
+
+      // Better Auth returns { data, error } - throw if error exists
+      if (result.error) {
+        throw new Error(result.error.message || "An error occurred while signing up.");
+      }
+
+      return result.data;
     },
     onSuccess: () => {
       toast.success("¡Cuenta creada exitosamente! Redirigiendo...");

@@ -28,10 +28,21 @@ function LoginForm() {
 
   const { mutate: emailLoginMutate, isPending } = useMutation({
     mutationFn: async (data: LoginInput) => {
-      return await authClient.signIn.email({
+      const result = await authClient.signIn.email({
         ...data,
         callbackURL: redirectUrl,
       });
+
+      // Better Auth returns { data, error } - throw if error exists
+      if (result.error) {
+        throw new Error(result.error.message || "An error occurred while signing in.");
+      }
+
+      return result.data;
+    },
+    onSuccess: () => {
+      toast.success("¡Inicio de sesión exitoso!");
+      window.location.href = redirectUrl;
     },
     onError: (error: Error) => {
       toast.error(error.message || "An error occurred while signing in.");
