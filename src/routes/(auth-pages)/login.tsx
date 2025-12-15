@@ -49,17 +49,18 @@ function LoginForm() {
     },
   });
 
-  const onSubmit = handleSubmit((data: LoginInput) => {
+  const onSubmit = (data: LoginInput) => {
     if (isPending) return;
     emailLoginMutate(data);
-  });
+  };
 
   return (
     <div className="flex flex-col gap-6">
       <form
+        method="post"
         onSubmit={(e) => {
           e.preventDefault();
-          onSubmit(e);
+          handleSubmit(onSubmit)(e);
         }}
       >
         <div className="flex flex-col gap-6">

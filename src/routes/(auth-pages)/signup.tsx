@@ -53,18 +53,19 @@ function SignupForm() {
     },
   });
 
-  const onSubmit = handleSubmit((data: SignupInput) => {
+  const onSubmit = (data: SignupInput) => {
     if (isPending) return;
     const { name, email, password } = data;
     signupMutate({ name, email, password });
-  });
+  };
 
   return (
     <div className="flex flex-col gap-6">
       <form
+        method="post"
         onSubmit={(e) => {
           e.preventDefault();
-          onSubmit(e);
+          handleSubmit(onSubmit)(e);
         }}
       >
         <div className="flex flex-col gap-6">

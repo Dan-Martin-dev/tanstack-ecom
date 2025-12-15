@@ -71,7 +71,9 @@ function RootDocument({ children }: { readonly children: React.ReactNode }) {
       <body>
         <ThemeProvider>
           {children}
-          <Toaster richColors />
+          <ClientOnly>
+            <Toaster richColors />
+          </ClientOnly>
         </ThemeProvider>
 
         <TanStackDevtools
