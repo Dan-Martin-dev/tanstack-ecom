@@ -1,6 +1,8 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GalleryVerticalEnd, LoaderCircle } from "lucide-react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { SignInSocialButton } from "~/components/sign-in-social-button";
 import { Button } from "~/components/ui/button";
@@ -8,6 +10,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import authClient from "~/lib/auth/auth-client";
 import { authQueryOptions } from "~/lib/auth/queries";
+import { signupSchema, type SignupInput } from "~/lib/validations";
 
 export const Route = createFileRoute("/(auth-pages)/signup")({
   component: SignupForm,
@@ -18,9 +21,17 @@ function SignupForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupInput>({
+    resolver: zodResolver(signupSchema),
+  });
+
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (data: { name: string; email: string; password: string }) => {
-      await authClient.signUp.email(
+      return await authClient.signUp.email(
         {
           ...data,
           callbackURL: redirectUrl,
@@ -30,6 +41,7 @@ function SignupForm() {
             toast.error(error.message || "An error occurred while signing up.");
           },
           onSuccess: () => {
+            toast.success("¡Cuenta creada exitosamente! Redirigiendo...");
             queryClient.removeQueries({ queryKey: authQueryOptions().queryKey });
             navigate({ to: redirectUrl });
           },
@@ -38,37 +50,23 @@ function SignupForm() {
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = (data: SignupInput) => {
     if (isPending) return;
-
-    const formData = new FormData(e.currentTarget);
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const confirmPassword = formData.get("confirm_password") as string;
-
-    if (!name || !email || !password || !confirmPassword) return;
-
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match.");
-      return;
-    }
-
+    const { name, email, password } = data;
     signupMutate({ name, email, password });
   };
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a href="#" className="flex flex-col items-center gap-2 font-medium">
+            <Link to="/" className="flex flex-col items-center gap-2 font-medium">
               <div className="flex h-8 w-8 items-center justify-center rounded-md">
                 <GalleryVerticalEnd className="size-6" />
               </div>
               <span className="sr-only">Acme Inc.</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">Sign up for Acme Inc.</h1>
           </div>
           <div className="flex flex-col gap-5">
@@ -76,45 +74,57 @@ function SignupForm() {
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                name="name"
                 type="text"
                 placeholder="John Doe"
-                readOnly={isPending}
-                required
+                disabled={isPending}
+                aria-invalid={!!errors.name}
+                {...register("name")}
               />
+              {errors.name && (
+                <p className="text-sm text-red-600">{errors.name.message}</p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 placeholder="hello@example.com"
-                readOnly={isPending}
-                required
+                disabled={isPending}
+                aria-invalid={!!errors.email}
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
-                name="password"
                 type="password"
                 placeholder="Password"
-                readOnly={isPending}
-                required
+                disabled={isPending}
+                aria-invalid={!!errors.password}
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="confirm_password">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
-                id="confirm_password"
-                name="confirm_password"
+                id="confirmPassword"
                 type="password"
                 placeholder="Confirm Password"
-                readOnly={isPending}
-                required
+                disabled={isPending}
+                aria-invalid={!!errors.confirmPassword}
+                {...register("confirmPassword")}
               />
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-600">{errors.confirmPassword.message}</p>
+              )}
             </div>
             <Button type="submit" className="mt-2 w-full" size="lg" disabled={isPending}>
               {isPending && <LoaderCircle className="animate-spin" />}
