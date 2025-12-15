@@ -31,22 +31,18 @@ function SignupForm() {
 
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (data: { name: string; email: string; password: string }) => {
-      return await authClient.signUp.email(
-        {
-          ...data,
-          callbackURL: redirectUrl,
-        },
-        {
-          onError: ({ error }) => {
-            toast.error(error.message || "An error occurred while signing up.");
-          },
-          onSuccess: () => {
-            toast.success("¡Cuenta creada exitosamente! Redirigiendo...");
-            queryClient.removeQueries({ queryKey: authQueryOptions().queryKey });
-            navigate({ to: redirectUrl });
-          },
-        },
-      );
+      return await authClient.signUp.email({
+        ...data,
+        callbackURL: redirectUrl,
+      });
+    },
+    onSuccess: () => {
+      toast.success("¡Cuenta creada exitosamente! Redirigiendo...");
+      queryClient.invalidateQueries({ queryKey: authQueryOptions().queryKey });
+      navigate({ to: redirectUrl });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "An error occurred while signing up.");
     },
   });
 

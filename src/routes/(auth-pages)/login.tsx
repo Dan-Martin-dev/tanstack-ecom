@@ -28,17 +28,13 @@ function LoginForm() {
 
   const { mutate: emailLoginMutate, isPending } = useMutation({
     mutationFn: async (data: LoginInput) => {
-      return await authClient.signIn.email(
-        {
-          ...data,
-          callbackURL: redirectUrl,
-        },
-        {
-          onError: ({ error }) => {
-            toast.error(error.message || "An error occurred while signing in.");
-          },
-        },
-      );
+      return await authClient.signIn.email({
+        ...data,
+        callbackURL: redirectUrl,
+      });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "An error occurred while signing in.");
     },
   });
 
