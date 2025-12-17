@@ -73,9 +73,17 @@ export const useCartStore = create<CartStore>()(
     {
       name: "ecom_cart",
       partialize: (state) => ({ items: state.items }), // Only persist items, not isOpen
+      skipHydration: true, // Prevent hydration mismatch - we'll manually rehydrate on client
     },
   ),
 );
+
+// Manual rehydration function - call this in a useEffect on client
+export const rehydrateCartStore = () => {
+  if (typeof window !== "undefined") {
+    useCartStore.persist.rehydrate();
+  }
+};
 
 // Selectors for computed values (prevents unnecessary re-renders)
 export const useCartItemCount = () =>

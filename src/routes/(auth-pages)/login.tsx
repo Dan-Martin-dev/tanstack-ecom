@@ -54,23 +54,28 @@ function LoginForm() {
     emailLoginMutate(data);
   };
 
+  // Wrap handleSubmit to always prevent default
+  const onFormSubmit = handleSubmit(
+    (data) => {
+      console.log("[Login] Validation passed, data:", data);
+      onSubmit(data);
+    },
+    (errors) => {
+      console.error("[Login] Validation errors:", errors);
+      toast.error("Por favor corrige los errores en el formulario");
+    }
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <form
+        action="#"
         method="post"
         onSubmit={(e) => {
           e.preventDefault();
-          console.log("[Login] Form submitted - JS is working!");
-          handleSubmit(
-            (data) => {
-              console.log("[Login] Validation passed, data:", data);
-              onSubmit(data);
-            },
-            (errors) => {
-              console.error("[Login] Validation errors:", errors);
-              toast.error("Por favor corrige los errores en el formulario");
-            }
-          )(e);
+          e.stopPropagation();
+          console.log("[Login] Form submitted - JS intercepted!");
+          onFormSubmit(e);
         }}
       >
         <div className="flex flex-col gap-6">

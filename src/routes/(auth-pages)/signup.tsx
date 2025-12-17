@@ -70,23 +70,28 @@ function SignupForm() {
     signupMutate({ name, email, password });
   };
 
+  // Wrap handleSubmit to always prevent default
+  const onFormSubmit = handleSubmit(
+    (data) => {
+      console.log("[Signup] Validation passed, data:", data);
+      onSubmit(data);
+    },
+    (errors) => {
+      console.error("[Signup] Validation errors:", errors);
+      toast.error("Por favor corrige los errores en el formulario");
+    }
+  );
+
   return (
     <div className="flex flex-col gap-6">
       <form
+        action="#"
         method="post"
         onSubmit={(e) => {
           e.preventDefault();
-          console.log("[Signup] Form submitted - JS is working!");
-          handleSubmit(
-            (data) => {
-              console.log("[Signup] Validation passed, data:", data);
-              onSubmit(data);
-            },
-            (errors) => {
-              console.error("[Signup] Validation errors:", errors);
-              toast.error("Por favor corrige los errores en el formulario");
-            }
-          )(e);
+          e.stopPropagation();
+          console.log("[Signup] Form submitted - JS intercepted!");
+          onFormSubmit(e);
         }}
       >
         <div className="flex flex-col gap-6">

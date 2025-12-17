@@ -6,12 +6,14 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { authQueryOptions, type AuthQueryResult } from "~/lib/auth/queries";
+import { rehydrateCartStore } from "~/lib/cart/cart-store";
 import appCss from "~/styles.css?url";
 
 import { ClientOnly } from "~/components/client-only";
@@ -62,6 +64,11 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { readonly children: React.ReactNode }) {
+  // Rehydrate persisted stores on client after mount
+  useEffect(() => {
+    rehydrateCartStore();
+  }, []);
+
   return (
     // suppress since we're updating the "dark" class in ThemeProvider
     <html lang="en" suppressHydrationWarning>
