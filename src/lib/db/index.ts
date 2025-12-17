@@ -1,4 +1,3 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { env } from "~/env/server";
@@ -12,8 +11,4 @@ const driver = postgres(env.DATABASE_URL, {
   connect_timeout: 10, // Connection timeout in seconds
 });
 
-const getDatabase = createServerOnlyFn(() =>
-  drizzle({ client: driver, schema, casing: "snake_case" }),
-);
-
-export const db = getDatabase();
+export const db = drizzle({ client: driver, schema, casing: "snake_case" });

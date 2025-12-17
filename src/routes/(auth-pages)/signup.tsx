@@ -31,30 +31,41 @@ function SignupForm() {
 
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (data: { name: string; email: string; password: string }) => {
+      console.log("[Signup] Starting signup with data:", { name: data.name, email: data.email });
+      
       const result = await authClient.signUp.email({
         ...data,
         callbackURL: redirectUrl,
       });
 
+      console.log("[Signup] Result:", result);
+
       // Better Auth returns { data, error } - throw if error exists
       if (result.error) {
+        console.error("[Signup] Error:", result.error);
         throw new Error(result.error.message || "An error occurred while signing up.");
       }
 
       return result.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("[Signup] Success:", data);
       toast.success("¡Cuenta creada exitosamente! Redirigiendo...");
       queryClient.invalidateQueries({ queryKey: authQueryOptions().queryKey });
       navigate({ to: redirectUrl });
     },
     onError: (error: Error) => {
+      console.error("[Signup] onError:", error);
       toast.error(error.message || "An error occurred while signing up.");
     },
   });
 
   const onSubmit = (data: SignupInput) => {
-    if (isPending) return;
+    console.log("[Signup] onSubmit called with:", data);
+    if (isPending) {
+      console.log("[Signup] Already pending, skipping");
+      return;
+    }
     const { name, email, password } = data;
     signupMutate({ name, email, password });
   };
@@ -65,7 +76,17 @@ function SignupForm() {
         method="post"
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit(onSubmit)(e);
+          console.log("[Signup] Form submitted - JS is working!");
+          handleSubmit(
+            (data) => {
+              console.log("[Signup] Validation passed, data:", data);
+              onSubmit(data);
+            },
+            (errors) => {
+              console.error("[Signup] Validation errors:", errors);
+              toast.error("Por favor corrige los errores en el formulario");
+            }
+          )(e);
         }}
       >
         <div className="flex flex-col gap-6">

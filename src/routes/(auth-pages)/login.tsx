@@ -60,7 +60,17 @@ function LoginForm() {
         method="post"
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit(onSubmit)(e);
+          console.log("[Login] Form submitted - JS is working!");
+          handleSubmit(
+            (data) => {
+              console.log("[Login] Validation passed, data:", data);
+              onSubmit(data);
+            },
+            (errors) => {
+              console.error("[Login] Validation errors:", errors);
+              toast.error("Por favor corrige los errores en el formulario");
+            }
+          )(e);
         }}
       >
         <div className="flex flex-col gap-6">
