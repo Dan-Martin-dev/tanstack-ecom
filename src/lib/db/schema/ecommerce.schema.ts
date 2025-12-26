@@ -244,9 +244,10 @@ export const order = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     // Human-readable order number (e.g., ORD-2024-0001)
     orderNumber: varchar("order_number", { length: 20 }).notNull().unique(),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "restrict" }),
+    // User reference (nullable for guest checkout)
+    userId: text("user_id").references(() => user.id, { onDelete: "restrict" }),
+    // Guest email (for guest checkout without account)
+    guestEmail: varchar("guest_email", { length: 255 }),
     status: orderStatusEnum("status").default("pending").notNull(),
     // Prices in centavos (ARS)
     subtotal: integer("subtotal").notNull(),

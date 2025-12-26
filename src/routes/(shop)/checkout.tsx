@@ -1,9 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { useCart } from "~/lib/cart/cart-store";
+import { useCart, useCartStore } from "~/lib/cart/cart-store";
+import type { CreateOrderInput } from "~/lib/server/orders";
 import { checkoutSchema, type CheckoutInput } from "~/lib/validations";
 
 export const Route = createFileRoute("/(shop)/checkout")({
@@ -80,14 +82,20 @@ function formatPrice(priceInCentavos: number): string {
 function CheckoutPage() {
   const navigate = useNavigate();
   const { state, subtotal } = useCart();
+  const clearCart = useCartStore((s) => s.clearCart);
   const [shippingZone, setShippingZone] = useState<ShippingZone>("amba");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const shippingCost = calculateShipping(shippingZone, subtotal);
   const total = subtotal + shippingCost;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+    setIsSubmitting(true);
+    setErrors({});
+
     const formData = new FormData(e.currentTarget);
 
     const data: CheckoutInput = {
@@ -115,12 +123,68 @@ function CheckoutPage() {
         fieldErrors[path] = issue.message;
       });
       setErrors(fieldErrors);
+      setIsSubmitting(false);
       return;
     }
 
-    // TODO: Create order in database and redirect to payment
-    console.log("Checkout data:", result.data);
-    await navigate({ to: "/order-confirmation" });
+    // Create order in database
+    try {
+      const orderData: CreateOrderInput = {
+        guestEmail: result.data.email,
+        items: state.items.map((item) => ({
+          productId: item.productId,
+          productName: item.name,
+          productSku: null,
+          productImage: item.image,
+          unitPrice: item.price,
+          quantity: item.quantity,
+        })),
+        subtotal,
+        shippingCost,
+        total,
+        paymentMethod: result.data.paymentMethod,
+        shippingAddress: {
+          fullName: `${result.data.shippingAddress.firstName} ${result.data.shippingAddress.lastName}`,
+          phone: result.data.shippingAddress.phone,
+          street: result.data.shippingAddress.street,
+          number: "", // Street number is in the street field
+          floor: result.data.shippingAddress.apartment?.split(" ")[0],
+          apartment: result.data.shippingAddress.apartment,
+          city: result.data.shippingAddress.city,
+          province: result.data.shippingAddress.province,
+          postalCode: result.data.shippingAddress.postalCode,
+          zone: shippingZone,
+        },
+      };
+
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData),
+      });
+
+      const orderResult = (await response.json()) as
+        | { success: true; order: { id: string; orderNumber: string } }
+        | { success: false; error: string };
+
+      if (!orderResult.success) {
+        toast.error("Error al crear el pedido. Por favor intentá de nuevo.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Clear cart and redirect to confirmation
+      clearCart();
+      toast.success("¡Pedido creado exitosamente!");
+      await navigate({
+        to: "/order-confirmation",
+        search: { orderId: orderResult.order.id },
+      });
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error("Error al procesar el pedido. Por favor intentá de nuevo.");
+      setIsSubmitting(false);
+    }
   };
 
   if (state.items.length === 0) {
@@ -323,8 +387,8 @@ function CheckoutPage() {
             </div>
           </div>
 
-          <Button type="submit" size="lg" className="w-full">
-            Continuar al pago
+          <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "Procesando..." : "Continuar al pago"}
           </Button>
         </form>
 

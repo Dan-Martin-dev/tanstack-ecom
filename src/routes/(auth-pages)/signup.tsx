@@ -31,8 +31,11 @@ function SignupForm() {
 
   const { mutate: signupMutate, isPending } = useMutation({
     mutationFn: async (data: { name: string; email: string; password: string }) => {
-      console.log("[Signup] Starting signup with data:", { name: data.name, email: data.email });
-      
+      console.log("[Signup] Starting signup with data:", {
+        name: data.name,
+        email: data.email,
+      });
+
       const result = await authClient.signUp.email({
         ...data,
         callbackURL: redirectUrl,
@@ -79,7 +82,7 @@ function SignupForm() {
     (errors) => {
       console.error("[Signup] Validation errors:", errors);
       toast.error("Por favor corrige los errores en el formulario");
-    }
+    },
   );
 
   return (

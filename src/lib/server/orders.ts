@@ -1,10 +1,10 @@
-import { createServerOnlyFn } from "@tanstack/react-start";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, like } from "drizzle-orm";
 import { db } from "~/lib/db";
 import { order, orderItem } from "~/lib/db/schema/ecommerce.schema";
 
 export type CreateOrderInput = {
-  userId: string;
+  userId?: string;
+  guestEmail?: string;
   items: Array<{
     productId: string;
     productName: string;
@@ -45,7 +45,7 @@ async function generateOrderNumber(): Promise<string> {
   const lastOrder = await db
     .select({ orderNumber: order.orderNumber })
     .from(order)
-    .where(eq(order.orderNumber, prefix + "%"))
+    .where(like(order.orderNumber, `${prefix}%`))
     .orderBy(desc(order.createdAt))
     .limit(1);
 
@@ -58,7 +58,12 @@ async function generateOrderNumber(): Promise<string> {
   return `${prefix}${nextNumber.toString().padStart(4, "0")}`;
 }
 
-export const createOrder = createServerOnlyFn(async (input: CreateOrderInput) => {
+export async function createOrder(
+  input: CreateOrderInput,
+): Promise<
+  | { success: true; order: { id: string; orderNumber: string } }
+  | { success: false; error: string }
+> {
   try {
     const orderNumber = await generateOrderNumber();
 
@@ -67,7 +72,8 @@ export const createOrder = createServerOnlyFn(async (input: CreateOrderInput) =>
       .insert(order)
       .values({
         orderNumber,
-        userId: input.userId,
+        userId: input.userId || null,
+        guestEmail: input.guestEmail || null,
         status: "pending",
         subtotal: input.subtotal,
         shippingCost: input.shippingCost,
@@ -106,19 +112,19 @@ export const createOrder = createServerOnlyFn(async (input: CreateOrderInput) =>
     }
 
     return {
-      success: true,
-      order: newOrder,
+      success: true as const,
+      order: { id: newOrder.id, orderNumber: newOrder.orderNumber },
     };
   } catch (error) {
     console.error("Error creating order:", error);
     return {
-      success: false,
+      success: false as const,
       error: "Failed to create order",
     };
   }
-});
+}
 
-export const getOrderById = createServerOnlyFn(async (orderId: string) => {
+export async function getOrderById(orderId: string) {
   const [orderData] = await db.select().from(order).where(eq(order.id, orderId)).limit(1);
 
   if (!orderData) return null;
@@ -129,9 +135,9 @@ export const getOrderById = createServerOnlyFn(async (orderId: string) => {
     ...orderData,
     items,
   };
-});
+}
 
-export const getUserOrders = createServerOnlyFn(async (userId: string) => {
+export async function getUserOrders(userId: string) {
   const orders = await db
     .select()
     .from(order)
@@ -139,40 +145,38 @@ export const getUserOrders = createServerOnlyFn(async (userId: string) => {
     .orderBy(desc(order.createdAt));
 
   return orders;
-});
+}
 
-export const updateOrderStatus = createServerOnlyFn(
-  async (
-    orderId: string,
-    status:
-      | "pending"
-      | "paid"
-      | "processing"
-      | "shipped"
-      | "delivered"
-      | "cancelled"
-      | "refunded",
-  ) => {
-    try {
-      const [updatedOrder] = await db
-        .update(order)
-        .set({
-          status,
-          updatedAt: new Date(),
-        })
-        .where(eq(order.id, orderId))
-        .returning();
+export async function updateOrderStatus(
+  orderId: string,
+  status:
+    | "pending"
+    | "paid"
+    | "processing"
+    | "shipped"
+    | "delivered"
+    | "cancelled"
+    | "refunded",
+) {
+  try {
+    const [updatedOrder] = await db
+      .update(order)
+      .set({
+        status,
+        updatedAt: new Date(),
+      })
+      .where(eq(order.id, orderId))
+      .returning();
 
-      return {
-        success: true,
-        order: updatedOrder,
-      };
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      return {
-        success: false,
-        error: "Failed to update order status",
-      };
-    }
-  },
-);
+    return {
+      success: true,
+      order: updatedOrder,
+    };
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    return {
+      success: false,
+      error: "Failed to update order status",
+    };
+  }
+}

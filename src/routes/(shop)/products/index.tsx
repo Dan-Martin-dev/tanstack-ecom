@@ -1,11 +1,38 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { z } from "zod";
 import type { CategoryWithChildren, ProductWithRelations } from "~/lib/server/products";
-import { getCategories, getProducts } from "~/lib/server/products";
+import { getCategories, queryProducts } from "~/lib/server/products";
+
+// Search params schema for product filters
+const productSearchSchema = z.object({
+  search: z.string().optional(),
+  category: z.string().optional(),
+  minPrice: z.coerce.number().optional(),
+  maxPrice: z.coerce.number().optional(),
+  inStock: z.coerce.boolean().optional(),
+  sortBy: z
+    .enum(["price_asc", "price_desc", "newest", "name_asc", "name_desc"])
+    .optional(),
+  page: z.coerce.number().min(1).optional().default(1),
+});
+
+type ProductSearch = z.infer<typeof productSearchSchema>;
 
 export const Route = createFileRoute("/(shop)/products/")({
-  loader: async () => {
+  validateSearch: productSearchSchema,
+  loaderDeps: ({ search }) => search,
+  loader: async ({ deps }) => {
     const [productsData, categories] = await Promise.all([
-      getProducts(),
+      queryProducts({
+        search: deps.search,
+        categorySlug: deps.category,
+        minPrice: deps.minPrice ? deps.minPrice * 100 : undefined, // Convert to centavos
+        maxPrice: deps.maxPrice ? deps.maxPrice * 100 : undefined,
+        inStock: deps.inStock,
+        sortBy: deps.sortBy,
+        page: deps.page,
+        limit: 12,
+      }),
       getCategories(),
     ]);
     return { productsData, categories };
@@ -23,6 +50,28 @@ function formatPrice(centavos: number): string {
 function ProductsPage() {
   const { productsData, categories } = Route.useLoaderData();
   const { products, total, page, totalPages } = productsData;
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+
+  // Helper to update search params
+  const updateFilters = (updates: Partial<ProductSearch>) => {
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        ...updates,
+        // Reset to page 1 when filters change (unless we're changing page)
+        page: "page" in updates ? updates.page : 1,
+      }),
+    });
+  };
+
+  // Price range options (in ARS, not centavos)
+  const priceRanges = [
+    { label: "Hasta $10.000", min: undefined, max: 10000 },
+    { label: "$10.000 - $50.000", min: 10000, max: 50000 },
+    { label: "$50.000 - $100.000", min: 50000, max: 100000 },
+    { label: "Más de $100.000", min: 100000, max: undefined },
+  ];
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -74,22 +123,27 @@ function ProductsPage() {
             <div>
               <h3 className="mb-3 font-semibold">Precio</h3>
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  Hasta $10.000
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  $10.000 - $50.000
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  $50.000 - $100.000
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  Más de $100.000
-                </label>
+                {priceRanges.map((range) => {
+                  const isActive =
+                    search.minPrice === range.min && search.maxPrice === range.max;
+                  return (
+                    <label key={range.label} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        className="rounded"
+                        checked={isActive}
+                        onChange={() => {
+                          if (isActive) {
+                            updateFilters({ minPrice: undefined, maxPrice: undefined });
+                          } else {
+                            updateFilters({ minPrice: range.min, maxPrice: range.max });
+                          }
+                        }}
+                      />
+                      {range.label}
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -97,15 +151,38 @@ function ProductsPage() {
               <h3 className="mb-3 font-semibold">Disponibilidad</h3>
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
+                  <input
+                    type="checkbox"
+                    className="rounded"
+                    checked={search.inStock ?? false}
+                    onChange={(e) =>
+                      updateFilters({ inStock: e.target.checked || undefined })
+                    }
+                  />
                   En stock
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  Envío gratis
                 </label>
               </div>
             </div>
+
+            {/* Clear filters */}
+            {Boolean(
+              search.minPrice ||
+              search.maxPrice ||
+              search.inStock ||
+              search.category ||
+              search.sortBy,
+            ) && (
+              <button
+                onClick={() =>
+                  navigate({
+                    search: {},
+                  })
+                }
+                className="text-primary text-sm hover:underline"
+              >
+                Limpiar filtros
+              </button>
+            )}
           </div>
         </aside>
 
@@ -115,11 +192,21 @@ function ProductsPage() {
             <p className="text-muted-foreground text-sm">
               Mostrando {products.length} de {total} productos
             </p>
-            <select className="border-input bg-background rounded-md border px-3 py-2 text-sm">
-              <option>Más relevantes</option>
-              <option>Menor precio</option>
-              <option>Mayor precio</option>
-              <option>Más recientes</option>
+            <select
+              className="border-input bg-background rounded-md border px-3 py-2 text-sm"
+              value={search.sortBy ?? ""}
+              onChange={(e) =>
+                updateFilters({
+                  sortBy: (e.target.value || undefined) as ProductSearch["sortBy"],
+                })
+              }
+            >
+              <option value="">Más relevantes</option>
+              <option value="price_asc">Menor precio</option>
+              <option value="price_desc">Mayor precio</option>
+              <option value="newest">Más recientes</option>
+              <option value="name_asc">A-Z</option>
+              <option value="name_desc">Z-A</option>
             </select>
           </div>
 
@@ -215,24 +302,40 @@ function ProductsPage() {
               <button
                 className="border-input rounded-md border px-3 py-2 text-sm disabled:opacity-50"
                 disabled={page <= 1}
+                onClick={() => updateFilters({ page: page - 1 })}
               >
                 ← Anterior
               </button>
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(
-                (p) => (
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                // Show pages around current page
+                let pageNum: number;
+                if (totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (page <= 3) {
+                  pageNum = i + 1;
+                } else if (page >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i;
+                } else {
+                  pageNum = page - 2 + i;
+                }
+                return (
                   <button
-                    key={p}
+                    key={pageNum}
                     className={`rounded-md border px-3 py-2 text-sm ${
-                      p === page ? "bg-primary text-primary-foreground" : "border-input"
+                      pageNum === page
+                        ? "bg-primary text-primary-foreground"
+                        : "border-input"
                     }`}
+                    onClick={() => updateFilters({ page: pageNum })}
                   >
-                    {p}
+                    {pageNum}
                   </button>
-                ),
-              )}
+                );
+              })}
               <button
                 className="border-input rounded-md border px-3 py-2 text-sm disabled:opacity-50"
                 disabled={page >= totalPages}
+                onClick={() => updateFilters({ page: page + 1 })}
               >
                 Siguiente →
               </button>

@@ -63,7 +63,7 @@ function LoginForm() {
     (errors) => {
       console.error("[Login] Validation errors:", errors);
       toast.error("Por favor corrige los errores en el formulario");
-    }
+    },
   );
 
   return (
