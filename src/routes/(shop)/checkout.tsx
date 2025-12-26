@@ -173,7 +173,37 @@ function CheckoutPage() {
         return;
       }
 
-      // Clear cart and redirect to confirmation
+      // If payment method is Mercado Pago, initialize payment and redirect
+      if (result.data.paymentMethod === "mercadopago") {
+        const mpResponse = await fetch("/api/checkout/mercadopago", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: orderResult.order.id }),
+        });
+
+        const mpResult = (await mpResponse.json()) as
+          | {
+              preferenceId: string;
+              initPoint: string;
+              sandboxInitPoint?: string;
+            }
+          | { error: string };
+
+        if ("error" in mpResult) {
+          toast.error("Error al inicializar el pago. Por favor intentá de nuevo.");
+          setIsSubmitting(false);
+          return;
+        }
+
+        // Clear cart before redirecting to Mercado Pago
+        clearCart();
+
+        // Redirect to Mercado Pago checkout
+        window.location.href = mpResult.initPoint;
+        return;
+      }
+
+      // For other payment methods, clear cart and redirect to confirmation
       clearCart();
       toast.success("¡Pedido creado exitosamente!");
       await navigate({

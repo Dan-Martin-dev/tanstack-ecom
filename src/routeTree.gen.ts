@@ -25,6 +25,8 @@ import { Route as shopProductsIndexRouteImport } from './routes/(shop)/products/
 import { Route as shopCategoriesIndexRouteImport } from './routes/(shop)/categories/index'
 import { Route as authenticatedDashboardIndexRouteImport } from './routes/(authenticated)/dashboard/index'
 import { Route as authenticatedAccountIndexRouteImport } from './routes/(authenticated)/account/index'
+import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api/webhooks/mercadopago'
+import { Route as ApiCheckoutMercadopagoRouteImport } from './routes/api/checkout/mercadopago'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as shopProductsSlugRouteImport } from './routes/(shop)/products/$slug'
 import { Route as shopCategoriesSlugRouteImport } from './routes/(shop)/categories/$slug'
@@ -114,6 +116,16 @@ const authenticatedAccountIndexRoute =
     path: '/',
     getParentRoute: () => authenticatedAccountRouteRoute,
   } as any)
+const ApiWebhooksMercadopagoRoute = ApiWebhooksMercadopagoRouteImport.update({
+  id: '/api/webhooks/mercadopago',
+  path: '/api/webhooks/mercadopago',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCheckoutMercadopagoRoute = ApiCheckoutMercadopagoRouteImport.update({
+  id: '/api/checkout/mercadopago',
+  path: '/api/checkout/mercadopago',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -170,6 +182,8 @@ export interface FileRoutesByFullPath {
   '/categories/$slug': typeof shopCategoriesSlugRoute
   '/products/$slug': typeof shopProductsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/checkout/mercadopago': typeof ApiCheckoutMercadopagoRoute
+  '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/account/': typeof authenticatedAccountIndexRoute
   '/dashboard/': typeof authenticatedDashboardIndexRoute
   '/categories': typeof shopCategoriesIndexRoute
@@ -190,6 +204,8 @@ export interface FileRoutesByTo {
   '/categories/$slug': typeof shopCategoriesSlugRoute
   '/products/$slug': typeof shopProductsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/checkout/mercadopago': typeof ApiCheckoutMercadopagoRoute
+  '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/account': typeof authenticatedAccountIndexRoute
   '/dashboard': typeof authenticatedDashboardIndexRoute
   '/categories': typeof shopCategoriesIndexRoute
@@ -216,6 +232,8 @@ export interface FileRoutesById {
   '/(shop)/categories/$slug': typeof shopCategoriesSlugRoute
   '/(shop)/products/$slug': typeof shopProductsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/checkout/mercadopago': typeof ApiCheckoutMercadopagoRoute
+  '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/(authenticated)/account/': typeof authenticatedAccountIndexRoute
   '/(authenticated)/dashboard/': typeof authenticatedDashboardIndexRoute
   '/(shop)/categories/': typeof shopCategoriesIndexRoute
@@ -240,6 +258,8 @@ export interface FileRouteTypes {
     | '/categories/$slug'
     | '/products/$slug'
     | '/api/auth/$'
+    | '/api/checkout/mercadopago'
+    | '/api/webhooks/mercadopago'
     | '/account/'
     | '/dashboard/'
     | '/categories'
@@ -260,6 +280,8 @@ export interface FileRouteTypes {
     | '/categories/$slug'
     | '/products/$slug'
     | '/api/auth/$'
+    | '/api/checkout/mercadopago'
+    | '/api/webhooks/mercadopago'
     | '/account'
     | '/dashboard'
     | '/categories'
@@ -285,6 +307,8 @@ export interface FileRouteTypes {
     | '/(shop)/categories/$slug'
     | '/(shop)/products/$slug'
     | '/api/auth/$'
+    | '/api/checkout/mercadopago'
+    | '/api/webhooks/mercadopago'
     | '/(authenticated)/account/'
     | '/(authenticated)/dashboard/'
     | '/(shop)/categories/'
@@ -297,6 +321,8 @@ export interface RootRouteChildren {
   authenticatedRouteRoute: typeof authenticatedRouteRouteWithChildren
   shopRouteRoute: typeof shopRouteRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCheckoutMercadopagoRoute: typeof ApiCheckoutMercadopagoRoute
+  ApiWebhooksMercadopagoRoute: typeof ApiWebhooksMercadopagoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -412,6 +438,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/'
       preLoaderRoute: typeof authenticatedAccountIndexRouteImport
       parentRoute: typeof authenticatedAccountRouteRoute
+    }
+    '/api/webhooks/mercadopago': {
+      id: '/api/webhooks/mercadopago'
+      path: '/api/webhooks/mercadopago'
+      fullPath: '/api/webhooks/mercadopago'
+      preLoaderRoute: typeof ApiWebhooksMercadopagoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/checkout/mercadopago': {
+      id: '/api/checkout/mercadopago'
+      path: '/api/checkout/mercadopago'
+      fullPath: '/api/checkout/mercadopago'
+      preLoaderRoute: typeof ApiCheckoutMercadopagoRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -576,6 +616,8 @@ const rootRouteChildren: RootRouteChildren = {
   authenticatedRouteRoute: authenticatedRouteRouteWithChildren,
   shopRouteRoute: shopRouteRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCheckoutMercadopagoRoute: ApiCheckoutMercadopagoRoute,
+  ApiWebhooksMercadopagoRoute: ApiWebhooksMercadopagoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
