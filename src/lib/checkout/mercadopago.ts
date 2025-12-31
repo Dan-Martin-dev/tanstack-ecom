@@ -1,4 +1,4 @@
-import { MercadoPagoConfig, Preference, Payment } from "mercadopago";
+import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
 import crypto from "node:crypto";
 
 // Initialize Mercado Pago client
